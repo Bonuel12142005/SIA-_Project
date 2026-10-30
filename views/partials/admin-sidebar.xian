@@ -1,0 +1,14 @@
+<aside class="app-sidebar">
+  <a class="brand" href="/dashboard"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a>
+  <p class="sidebar-label">ADMIN PORTAL</p>
+  <nav class="sidebar-nav" aria-label="Admin navigation">
+    <a class="nav-link {{#if adminNavDashboard}}is-active{{/if}}" href="/dashboard" {{#if adminNavDashboard}}aria-current="page"{{/if}}><span class="nav-icon">⌂</span><span>Dashboard</span></a>
+    <a class="nav-link {{#if adminNavDirectory}}is-active{{/if}}" href="/members" {{#if adminNavDirectory}}aria-current="page"{{/if}}><span class="nav-icon">♙</span><span>Member Directory</span></a>
+    <a class="nav-link {{#if adminNavRegister}}is-active{{/if}}" href="/members/new" {{#if adminNavRegister}}aria-current="page"{{/if}}><span class="nav-icon">＋</span><span>Register Member</span></a>
+    <a class="nav-link {{#if adminNavAudit}}is-active{{/if}}" href="/admin/audit" {{#if adminNavAudit}}aria-current="page"{{/if}}><span class="nav-icon">◷</span><span>Audit Logs</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user"><span class="user-avatar">{{currentInitials}}</span><span><strong>{{current.name}}</strong><small>Administrator</small></span></div>
+    <a class="logout-link" href="/logout">Log out <span aria-hidden="true">↗</span></a>
+  </div>
+</aside>

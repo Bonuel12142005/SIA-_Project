@@ -1,0 +1,27 @@
+{{> head}}
+<body class="app-body admin-portal">
+  <div class="app-shell">
+    {{> admin-sidebar}}
+    <main class="app-main">
+      <header class="topbar"><span class="breadcrumb">Administration <span>/</span> Audit Logs</span><span class="topbar-label">SYSTEM ACTIVITY</span></header>
+      <section class="page-content">
+        <div class="page-heading"><div><p class="eyebrow">ACCOUNTABILITY</p><h1>Audit Logs</h1><p class="page-subtitle">A chronological record of membership decisions and administrative actions.</p></div></div>
+        <section class="directory-card">
+          <div class="directory-heading"><div><h2>Recent activity</h2><p class="muted-copy">Showing the latest 100 recorded events.</p></div></div>
+          <div class="table-wrap">
+            <table class="member-table audit-table">
+              <thead><tr><th>ACTOR</th><th>ACTION</th><th>RECORD</th><th>DETAILS</th><th>DATE &amp; TIME</th></tr></thead>
+              <tbody>
+                {{#each entries}}
+                <tr><td>{{actorName}}</td><td><span class="audit-action">{{action}}</span></td><td>{{entityType}} #{{entityId}}</td><td class="audit-details">{{details}}</td><td>{{createdAt}}</td></tr>
+                {{else}}
+                <tr><td colspan="5"><div class="empty-state"><span class="empty-icon">◷</span><strong>No activity recorded yet</strong><p>Administrative decisions will appear here.</p></div></td></tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+{{> footer }}

@@ -1,0 +1,33 @@
+{{> head}}
+<body class="app-body member-portal">
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <a class="brand" href="/dashboard"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a>
+      <p class="sidebar-label">MEMBER PORTAL</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/dashboard"><span class="nav-icon">⌂</span>Dashboard</a>
+        <a class="nav-link is-active" href="/member/id-card"><span class="nav-icon">▣</span>Digital ID</a>
+        <a class="nav-link" href="/member/profile"><span class="nav-icon">♙</span>My Profile</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-user"><span class="user-avatar">{{currentInitials}}</span><span><strong>{{current.name}}</strong><small>Member</small></span></div>
+        <a class="logout-link" href="/logout">Log out <span aria-hidden="true">↗</span></a>
+      </div>
+    </aside>
+    <main class="app-main">
+      <header class="topbar"><span class="breadcrumb"><a href="/dashboard">Member portal</a><span>/</span>Digital ID</span><span class="topbar-label">MEMBER IDENTIFICATION</span></header>
+      <section class="page-content id-card-page">
+        <div class="page-heading"><div><p class="eyebrow">YOUR KAMBAC ID</p><h1>Digital member card</h1><p class="page-subtitle">Show your digital card when you need to verify your membership.</p></div><button class="button button-secondary no-print" type="button" onclick="window.print()">Print card</button></div>
+        <article class="digital-id-card">
+          <div class="id-card-top"><a class="brand" href="/dashboard"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a><span class="id-card-label">MEMBER IDENTIFICATION</span></div>
+          <div class="id-card-body">
+            <div class="id-card-person"><span class="id-card-avatar">{{currentInitials}}</span><p class="eyebrow">KAMBAC MEMBER</p><h2>{{current.name}}</h2><p class="id-card-number">{{current.memberId}}</p><div class="id-card-status"><span class="status-badge {{#if current.isActive}}status-active{{else}}status-inactive{{/if}}"><i></i>{{current.status}}</span></div></div>
+            <div class="id-card-qr"><img src="{{qrCode}}" alt="QR code for member ID {{current.memberId}}"><small>Scan to read member ID</small></div>
+          </div>
+          <div class="id-card-bottom"><span>Member since {{current.membershipDate}}</span><span>Keep this card available for verification</span></div>
+        </article>
+        <p class="id-card-note">The QR code contains your member ID only. Protect your card and contact an administrator if your membership details need correction.</p>
+      </section>
+    </main>
+  </div>
+{{> footer }}

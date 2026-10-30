@@ -1,0 +1,35 @@
+{{> head}}
+<body class="app-body member-portal">
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <a class="brand" href="/dashboard"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a>
+      <p class="sidebar-label">MEMBER PORTAL</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/dashboard"><span class="nav-icon">⌂</span>Dashboard</a>
+        <a class="nav-link" href="/member/id-card"><span class="nav-icon">▣</span>Digital ID</a>
+        <a class="nav-link is-active" href="/member/profile"><span class="nav-icon">♙</span>My Profile</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-user"><span class="user-avatar">{{currentInitials}}</span><span><strong>{{current.name}}</strong><small>Member</small></span></div>
+        <a class="logout-link" href="/logout">Log out <span aria-hidden="true">↗</span></a>
+      </div>
+    </aside>
+    <main class="app-main">
+      <header class="topbar"><span class="breadcrumb"><a href="/dashboard">Member portal</a><span>/</span>My profile</span><span class="topbar-label">PERSONAL DETAILS</span></header>
+      <section class="page-content form-page">
+        <div class="page-heading"><div><p class="eyebrow">ACCOUNT SETTINGS</p><h1>My profile</h1><p class="page-subtitle">Keep your contact details current. Changes are recorded in the system audit trail.</p></div></div>
+        {{#if errorMessage}}<p class="form-alert" role="alert">{{errorMessage}}</p>{{/if}}
+        <form class="form-card" method="POST" action="/member/profile">
+          <div class="form-section-title"><span class="form-section-icon">01</span><span><strong>Personal information</strong><small>Only your own account details can be changed here.</small></span></div>
+          <div class="form-grid">
+            <label class="form-field form-field-wide"><span>Full name <b>*</b></span><input name="name" type="text" value="{{current.name}}" minlength="2" maxlength="120" autocomplete="name" required></label>
+            <label class="form-field form-field-wide"><span>Email address <b>*</b></span><input name="email" type="email" value="{{current.email}}" maxlength="254" autocomplete="email" required></label>
+            <label class="form-field form-field-wide"><span>Contact number <b>*</b></span><input name="contactNumber" type="tel" value="{{current.contactNumber}}" minlength="7" maxlength="40" autocomplete="tel" required></label>
+            <label class="form-field form-field-wide"><span>Home address <b>*</b></span><textarea name="address" rows="3" minlength="5" maxlength="500" autocomplete="street-address" required>{{current.address}}</textarea></label>
+          </div>
+          <div class="form-actions"><a class="button button-secondary" href="/dashboard">Cancel</a><button class="button button-primary" type="submit">Save profile</button></div>
+        </form>
+      </section>
+    </main>
+  </div>
+{{> footer }}

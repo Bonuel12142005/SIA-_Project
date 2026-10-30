@@ -1,0 +1,286 @@
+{{> head}}
+<body class="app-body admin-portal">
+  <div class="app-shell">
+    {{> admin-sidebar}}
+
+    <main class="app-main">
+      <header class="topbar"><span class="breadcrumb">Workspace <span>/</span>{{#if showingArchived}} Archive{{else}} Member Directory{{/if}}</span><span class="topbar-label">KAMBAC MEMBER REPOSITORY</span></header>
+      <section class="page-content">
+        <div class="page-heading">
+          <div><p class="eyebrow">{{#if showingArchived}}RECORD HISTORY{{else}}CENTRAL REPOSITORY{{/if}}</p><h1>{{#if showingArchived}}Archived members{{else}}Member Management{{/if}}</h1><p class="page-subtitle">{{#if showingArchived}}Historical member records retained for reference.{{else}}Maintain member profiles, status, and organizational records.{{/if}}</p></div>
+          {{#unless showingArchived}}<div class="page-actions"><a class="button action-button" href="/members/renewals">Renewal tracking</a><a class="button action-button" href="/admin/applications">Applications</a><a class="button action-button" href="/members/export.csv">Export Excel CSV</a><a class="button action-button" href="/members/export.pdf" target="_blank" rel="noopener">Export PDF</a><button class="button button-primary" type="button" data-open-member-modal><span aria-hidden="true">＋</span> Register member</button></div>{{/unless}}
+        </div>
+
+        {{#unless showingArchived}}
+        <section class="stats-grid" aria-label="Membership statistics">
+          <article class="stat-card"><div class="stat-top"><span>Total members</span><span class="stat-icon">♙</span></div><strong>{{totalMembers}}</strong><small>Current records</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Active</span><span class="stat-icon">✓</span></div><strong>{{activeMembers}}</strong><small>Active memberships</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Inactive</span><span class="stat-icon">◌</span></div><strong>{{inactiveMembers}}</strong><small>Inactive memberships</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Suspended</span><span class="stat-icon">!</span></div><strong>{{suspendedMembers}}</strong><small>Suspended memberships</small></article>
+        </section>
+        {{/unless}}
+
+        <section class="directory-card">
+          <div class="directory-heading">
+            <div><h2>{{#if showingArchived}}Archived records{{else}}Organization members{{/if}}</h2><p class="muted-copy">Search by member ID, name, address, or contact details.</p></div>
+            <form class="directory-filters" id="member-filters" method="GET" action="{{#if showingArchived}}/members/archive{{else}}/members{{/if}}">
+              <label class="search-box"><span aria-hidden="true">⌕</span><input id="member-search" type="search" name="search" value="{{search}}" maxlength="100" placeholder="Search name or Member ID..." aria-label="Search members"></label>
+              <label class="filter-select-label"><span class="sr-only">Filter by status</span><select id="member-status-filter" name="status" class="filter-select"><option value="all" {{#if statusAll}}selected{{/if}}>All statuses</option><option value="Active" {{#if statusActive}}selected{{/if}}>Active</option><option value="Inactive" {{#if statusInactive}}selected{{/if}}>Inactive</option><option value="Suspended" {{#if statusSuspended}}selected{{/if}}>Suspended</option></select></label>
+              <label class="filter-select-label"><span class="sr-only">Rows per page</span><select name="pageSize" class="filter-select"><option value="10" {{#if pageSize10}}selected{{/if}}>10 per page</option><option value="25" {{#if pageSize25}}selected{{/if}}>25 per page</option><option value="50" {{#if pageSize50}}selected{{/if}}>50 per page</option></select></label>
+              <button class="button button-secondary" type="submit">Apply</button>
+            </form>
+          </div>
+          <div class="table-wrap">
+            <table class="member-table">
+              <thead><tr><th>MEMBER</th><th>MEMBER ID</th><th>CONTACT DETAILS</th><th>ADDRESS</th><th>MEMBERSHIP DATE</th><th>STATUS</th><th><span class="sr-only">Record actions</span></th></tr></thead>
+              <tbody id="member-table-body">
+                {{#each members}}
+                <tr data-member-id="{{id}}">
+                  <td><div class="member-identity"><span class="member-avatar">{{initials}}</span><span><strong>{{firstName}} {{lastName}}</strong><small>Member profile</small></span></div></td>
+                  <td class="member-id">{{memberId}}</td>
+                  <td>{{contactNumber}}</td>
+                  <td class="member-address" title="{{address}}">{{address}}</td>
+                  <td class="joined-date">{{membershipDate}}</td>
+                  <td><span class="status-badge {{#if isActive}}status-active{{else}}{{#if isSuspended}}status-suspended{{else}}status-inactive{{/if}}{{/if}}"><i></i>{{status}}</span></td>
+                  <td class="row-actions">
+                    <a class="table-action" href="/members/{{id}}">View</a>
+                    {{#if ../showingArchived}}
+                    <form method="POST" action="/members/{{id}}/restore"><button class="table-action" type="submit">Restore</button></form>
+                    {{else}}
+                    <button class="table-action member-edit-button" type="button" data-edit-member="{{id}}">Edit</button>
+                    <form method="POST" action="/members/{{id}}/archive" onsubmit="return confirm('Archive this member record? It will remain available in the archive.');"><button class="table-action table-action-danger" type="submit">Archive</button></form>
+                    {{/if}}
+                  </td>
+                </tr>
+                {{else}}
+                <tr class="empty-table-row"><td colspan="7"><div class="empty-state"><span class="empty-icon">♙</span><strong>No matching records</strong><p>Try changing your search or status filter.</p><a class="text-link" href="{{#if showingArchived}}/members/archive{{else}}/members{{/if}}">Clear filters <span aria-hidden="true">→</span></a></div></td></tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          <div class="directory-footer">
+            <span>Showing {{visibleCount}} of {{total}} records · Page {{page}} of {{totalPages}}</span>
+            <nav class="pagination" id="member-pagination" aria-label="Member list pages">
+              {{#if hasPrevious}}<a class="pagination-link" href="{{pageBaseUrl}}&page={{previousPage}}">← Previous</a>{{else}}<span class="pagination-link is-disabled">← Previous</span>{{/if}}
+              {{#if hasNext}}<a class="pagination-link" href="{{pageBaseUrl}}&page={{nextPage}}">Next →</a>{{else}}<span class="pagination-link is-disabled">Next →</span>{{/if}}
+            </nav>
+          </div>
+        </section>
+        {{#if showingArchived}}<p class="archive-note">{{archivedMembers}} archived record(s) retained in the repository.</p>{{/if}}
+      </section>
+    </main>
+  </div>
+  {{#unless showingArchived}}
+  <div class="modal-backdrop" id="member-modal" hidden>
+    <section class="member-modal" role="dialog" aria-modal="true" aria-labelledby="member-modal-title">
+      <div class="modal-heading"><div><p class="eyebrow">MEMBER PROFILE</p><h2 id="member-modal-title">Register a member</h2><p class="muted-copy">Enter the member's personal and membership details.</p></div><button class="modal-close" type="button" aria-label="Close dialog" data-close-member-modal>&times;</button></div>
+      <form id="member-modal-form" class="modal-form">
+        <p class="modal-error" id="member-modal-error" role="alert" hidden></p>
+        <input type="hidden" id="member-record-id">
+        <label class="form-field"><span>First name <b>*</b></span><input id="member-first-name" name="firstName" type="text" minlength="1" maxlength="60" autocomplete="given-name" required></label>
+        <label class="form-field"><span>Last name <b>*</b></span><input id="member-last-name" name="lastName" type="text" minlength="1" maxlength="60" autocomplete="family-name" required></label>
+        <label class="form-field"><span>Contact number <b>*</b></span><input id="member-contact" name="contactNumber" type="tel" minlength="7" maxlength="40" placeholder="+63 9XX XXX XXXX" required></label>
+        <label class="form-field"><span>Complete address <b>*</b></span><textarea id="member-address" name="address" rows="2" minlength="5" maxlength="1000" required>Carmundo, Bongabong, Oriental Mindoro</textarea></label>
+        <label class="form-field"><span>Membership date <b>*</b></span><input id="member-date" name="membershipDate" type="date" max="{{today}}" required></label>
+        <label class="form-field"><span>Status <b>*</b></span><select id="member-status" name="status" required><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Suspended">Suspended</option></select></label>
+        <div class="modal-actions"><button class="button button-secondary" type="button" data-close-member-modal>Cancel</button><button class="button button-primary" id="member-modal-submit" type="submit">Create member</button></div>
+      </form>
+    </section>
+  </div>
+  <script>
+    (() => {
+      const modal = document.getElementById("member-modal");
+      const form = document.getElementById("member-modal-form");
+      const errorBox = document.getElementById("member-modal-error");
+      const searchInput = document.getElementById("member-search");
+      const statusFilter = document.getElementById("member-status-filter");
+      const tableBody = document.getElementById("member-table-body");
+      const pagination = document.getElementById("member-pagination");
+      const modalTitle = document.getElementById("member-modal-title");
+      const submitButton = document.getElementById("member-modal-submit");
+      const rowCount = document.querySelector(".directory-footer > span");
+      let currentPage = {{page}};
+      let totalPages = {{totalPages}};
+      let debounceTimer;
+      const field = (id) => document.getElementById(id);
+      const formatDate = (value) => {
+        const date = new Date(`${value}T00:00:00Z`);
+        return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(date);
+      };
+      const statusClass = (status) => status === "Active" ? "status-active" : status === "Suspended" ? "status-suspended" : "status-inactive";
+      const createCell = (text, className = "") => {
+        const cell = document.createElement("td");
+        cell.textContent = text || "—";
+        if (className) cell.className = className;
+        return cell;
+      };
+      const buildRow = (member) => {
+        const row = document.createElement("tr");
+        row.dataset.memberId = member.id;
+        const identity = document.createElement("td");
+        const identityWrap = document.createElement("div");
+        identityWrap.className = "member-identity";
+        const avatar = document.createElement("span");
+        avatar.className = "member-avatar";
+        avatar.textContent = [member.firstName, member.lastName].filter(Boolean).map((part) => part[0]).join("").toUpperCase();
+        const names = document.createElement("span");
+        const name = document.createElement("strong");
+        name.textContent = `${member.firstName} ${member.lastName}`.trim();
+        const caption = document.createElement("small");
+        caption.textContent = "Member profile";
+        names.append(name, caption);
+        identityWrap.append(avatar, names);
+        identity.append(identityWrap);
+        row.append(identity, createCell(member.memberId, "member-id"), createCell(member.contactNumber), createCell(member.address, "member-address"), createCell(member.membershipDate));
+        const statusCell = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = `status-badge ${statusClass(member.status)}`;
+        const dot = document.createElement("i");
+        badge.append(dot, document.createTextNode(member.status));
+        statusCell.append(badge);
+        row.append(statusCell);
+        const actions = document.createElement("td");
+        actions.className = "row-actions";
+        const viewLink = document.createElement("a");
+        viewLink.className = "table-action";
+        viewLink.href = `/members/${member.id}`;
+        viewLink.textContent = "View";
+        const editButton = document.createElement("button");
+        editButton.className = "table-action member-edit-button";
+        editButton.type = "button";
+        editButton.dataset.editMember = member.id;
+        editButton.textContent = "Edit";
+        actions.append(viewLink, editButton);
+        row.append(actions);
+        return row;
+      };
+      const renderEmpty = () => {
+        const row = document.createElement("tr");
+        row.className = "empty-table-row";
+        const cell = document.createElement("td");
+        cell.colSpan = 7;
+        const message = document.createElement("div");
+        message.className = "empty-state";
+        const title = document.createElement("strong");
+        title.textContent = "No matching records";
+        const detail = document.createElement("p");
+        detail.textContent = "Try another name, Member ID, or status.";
+        message.append(title, detail);
+        cell.append(message);
+        row.append(cell);
+        tableBody.replaceChildren(row);
+      };
+      const loadMembers = async (page = 1) => {
+        const params = new URLSearchParams({
+          search: searchInput.value.trim(),
+          status: statusFilter.value,
+          page: String(page),
+          pageSize: "{{pageSize}}"
+        });
+        try {
+          const response = await fetch(`/api/members?${params}`, { headers: { Accept: "application/json" } });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "Could not load member records.");
+          currentPage = data.page;
+          totalPages = data.totalPages;
+          if (data.members.length) tableBody.replaceChildren(...data.members.map(buildRow));
+          else renderEmpty();
+          rowCount.textContent = `Showing ${data.members.length} of ${data.total} records · Page ${data.page} of ${data.totalPages}`;
+          const previousLink = document.createElement(data.page > 1 ? "a" : "span");
+          previousLink.className = `pagination-link${data.page > 1 ? "" : " is-disabled"}`;
+          previousLink.textContent = "← Previous";
+          previousLink.dataset.page = String(Math.max(1, data.page - 1));
+          const nextLink = document.createElement(data.page < data.totalPages ? "a" : "span");
+          nextLink.className = `pagination-link${data.page < data.totalPages ? "" : " is-disabled"}`;
+          nextLink.textContent = "Next →";
+          nextLink.dataset.page = String(Math.min(data.totalPages, data.page + 1));
+          if (previousLink.tagName === "A") previousLink.href = "#members";
+          if (nextLink.tagName === "A") nextLink.href = "#members";
+          pagination.replaceChildren(previousLink, nextLink);
+        } catch (error) {
+          errorBox.textContent = error.message;
+          errorBox.hidden = false;
+        }
+      };
+      const openModal = (member = null) => {
+        form.reset();
+        errorBox.hidden = true;
+        errorBox.textContent = "";
+        field("member-record-id").value = member?.id || "";
+        field("member-first-name").value = member?.firstName || "";
+        field("member-last-name").value = member?.lastName || "";
+        field("member-contact").value = member?.contactNumber || "";
+        field("member-address").value = member?.address || "Carmundo, Bongabong, Oriental Mindoro";
+        field("member-date").value = member?.membershipDate || new Date().toISOString().slice(0, 10);
+        field("member-status").value = member?.status || "Active";
+        modalTitle.textContent = member ? "Edit member profile" : "Register a member";
+        submitButton.textContent = member ? "Save changes" : "Create member";
+        modal.hidden = false;
+        document.body.classList.add("modal-open");
+        field("member-first-name").focus();
+      };
+      const closeModal = () => {
+        modal.hidden = true;
+        document.body.classList.remove("modal-open");
+      };
+      document.querySelector("[data-open-member-modal]").addEventListener("click", () => openModal());
+      modal.querySelectorAll("[data-close-member-modal]").forEach((button) => button.addEventListener("click", closeModal));
+      modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+      document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !modal.hidden) closeModal(); });
+      tableBody.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-edit-member]");
+        if (!button) return;
+        try {
+          const response = await fetch(`/api/members/${encodeURIComponent(button.closest("tr").querySelector(".member-id").textContent.trim())}`, { headers: { Accept: "application/json" } });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "Could not load member profile.");
+          openModal(data.member);
+        } catch (error) {
+          errorBox.textContent = error.message;
+          errorBox.hidden = false;
+        }
+      });
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        const recordId = field("member-record-id").value;
+        const payload = Object.fromEntries(new FormData(form).entries());
+        delete payload.undefined;
+        const url = recordId ? `/api/members/${recordId}` : "/api/members";
+        try {
+          const response = await fetch(url, {
+            method: recordId ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            const details = data.fields ? Object.values(data.fields).join(" ") : "";
+            throw new Error(details || data.error || "Could not save member record.");
+          }
+          closeModal();
+          await loadMembers(recordId ? currentPage : 1);
+        } catch (error) {
+          errorBox.textContent = error.message;
+          errorBox.hidden = false;
+        }
+      });
+      searchInput.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => loadMembers(1), 250);
+      });
+      statusFilter.addEventListener("change", () => loadMembers(1));
+      document.querySelector(".directory-filters").addEventListener("submit", (event) => {
+        event.preventDefault();
+        loadMembers(1);
+      });
+      pagination.addEventListener("click", (event) => {
+        const link = event.target.closest("[data-page]");
+        if (!link || link.classList.contains("is-disabled")) return;
+        event.preventDefault();
+        loadMembers(Number(link.dataset.page));
+      });
+    })();
+  </script>
+  {{/unless}}
+{{> footer }}

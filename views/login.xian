@@ -1,0 +1,19 @@
+{{> head}}
+<body class="app-body auth-page">
+  <a class="auth-back-link" href="/"><span aria-hidden="true">←</span> Back to KAMBAC</a>
+  <div class="auth-card">
+    <a class="brand auth-brand" href="/"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a>
+    <p class="eyebrow">MEMBER & ADMIN ACCESS</p>
+    <h1>Welcome back</h1>
+    <p class="page-subtitle auth-subtitle">Sign in to the KAMBAC Integrated Management System.</p>
+    {{#if registrationSubmitted}}<p class="form-success" role="status">Your application has been submitted. An administrator must approve it before you can sign in.</p>{{/if}}
+    {{#if errorMessage}}<p class="form-alert" role="alert">{{errorMessage}}</p>{{/if}}
+    <form class="auth-form" method="POST" action="/login">
+      <label class="form-field"><span>Username or Member ID <b>*</b></span><input type="text" name="identifier" value="{{loginIdentifier}}" placeholder="Enter your username or KMB ID" autocomplete="username" required></label>
+      <label class="form-field"><span>Password <b>*</b></span><input type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required></label>
+      <button class="button button-primary auth-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+      <a class="auth-login-link" href="/register">New member? Register here</a>
+    </form>
+    <p class="auth-role-note">For approved members and authorized KAMBAC administrators.</p>
+  </div>
+{{> footer }}

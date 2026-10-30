@@ -1,0 +1,23 @@
+{{> head}}
+<body class="app-body admin-portal print-body">
+  <main class="print-report">
+    <header class="print-report-header">
+      <a class="brand" href="/dashboard"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a>
+      <button class="button button-primary no-print" type="button" onclick="window.print()">Print / Save PDF</button>
+    </header>
+    <div class="print-report-title"><div><p class="eyebrow">KAMBAC MEMBER MANAGEMENT SYSTEM</p><h1>Member directory</h1><p>Generated {{generatedAt}} · {{totalMembers}} member records</p></div><span class="print-report-confidential">ADMINISTRATIVE RECORD</span></div>
+    <div class="table-wrap">
+      <table class="member-table print-member-table">
+        <thead><tr><th>MEMBER</th><th>MEMBER ID</th><th>CONTACT</th><th>ADDRESS</th><th>JOINED</th><th>STATUS</th></tr></thead>
+        <tbody>
+          {{#each members}}
+          <tr><td><strong>{{fullName}}</strong></td><td class="member-id">{{memberId}}</td><td>{{contactNumber}}</td><td class="print-address">{{address}}</td><td>{{membershipDate}}</td><td>{{status}}</td></tr>
+          {{else}}
+          <tr><td colspan="6" class="print-empty">No member records found.</td></tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    <footer class="print-report-footer"><span>Prepared by {{current.name}}</span><span>KAMBAC · Member directory</span></footer>
+  </main>
+{{> footer }}

@@ -1,0 +1,45 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kambac-member-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: kambac-member
+      DB_USER: kambac_app
+      DB_PASSWORD: change_this_password
+      SESSION_SECRET: ${SESSION_SECRET:?Set a strong SESSION_SECRET before starting the stack}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: kambac-member-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: kambac-member
+      MYSQL_USER: kambac_app
+      MYSQL_PASSWORD: change_this_password
+      MYSQL_ROOT_PASSWORD: change_root_password
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - kambac_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=change_root_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  kambac_mysql_data:

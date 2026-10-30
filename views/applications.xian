@@ -1,0 +1,30 @@
+{{> head}}
+<body class="app-body admin-portal">
+  <div class="app-shell">
+    {{> admin-sidebar}}
+    <main class="app-main">
+      <header class="topbar"><span class="breadcrumb">Administration <span>/</span> Applications</span><span class="topbar-label">MEMBERSHIP REVIEW</span></header>
+      <section class="page-content">
+        <div class="page-heading"><div><p class="eyebrow">MEMBERSHIP WORKFLOW</p><h1>Review applications</h1><p class="page-subtitle">Approve eligible applicants to create their member account and directory record.</p></div><span class="application-count">{{pendingCount}} awaiting review</span></div>
+        <section class="application-list" aria-label="Pending member applications">
+          {{#each applications}}
+          <article class="application-card">
+            <div class="application-heading"><div><span class="member-avatar application-avatar">{{initials}}</span><span><h2>{{name}}</h2><p>@{{username}} · Applied {{createdAt}}</p></span></div><span class="application-pending">Pending review</span></div>
+            <dl class="application-details">
+              <div><dt>Email</dt><dd>{{email}}</dd></div>
+              <div><dt>Contact number</dt><dd>{{contactNumber}}</dd></div>
+              <div class="application-address"><dt>Address</dt><dd>{{address}}</dd></div>
+            </dl>
+            <div class="application-actions">
+              <form method="POST" action="/admin/applications/{{id}}/reject" onsubmit="return confirm('Reject this membership application?');"><button class="button button-secondary" type="submit">Reject application</button></form>
+              <form method="POST" action="/admin/applications/{{id}}/approve" onsubmit="return confirm('Approve this application and create a member account?');"><button class="button button-primary" type="submit">Approve member</button></form>
+            </div>
+          </article>
+          {{else}}
+          <div class="directory-card"><div class="empty-state"><span class="empty-icon">✓</span><strong>All caught up</strong><p>There are no membership applications awaiting review.</p></div></div>
+          {{/each}}
+        </section>
+      </section>
+    </main>
+  </div>
+{{> footer }}

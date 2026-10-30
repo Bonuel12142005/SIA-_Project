@@ -1,0 +1,49 @@
+{{> head }}
+<body class="app-body landing-page">
+  <header class="landing-header">
+    <a class="brand landing-brand" href="/"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a>
+    <nav class="landing-nav" aria-label="Main navigation">
+      <a class="landing-nav-link" href="#about">About KAMBAC</a>
+      <a class="landing-nav-link" href="/preview">Preview dashboard</a>
+      <a class="landing-nav-link" href="/login">Member sign in</a>
+      <a class="button button-primary landing-nav-button" href="/register">Register</a>
+    </nav>
+  </header>
+  <main>
+    <section class="landing-hero">
+      <div class="landing-hero-copy">
+        <p class="eyebrow"><span class="hero-eyebrow-mark"></span> KAMBAC COMMUNITY PORTAL</p>
+        <h1>Working together.<br><span>Growing stronger.</span></h1>
+        <p class="landing-description">Welcome to the KAMBAC Integrated Management System — a shared space for our agrarian beneficiary farmer community to stay connected and manage membership information.</p>
+        <div class="landing-actions">
+          <a class="button button-primary landing-primary-button" href="/login">Sign in to your account <span aria-hidden="true">→</span></a>
+          <a class="landing-secondary-link" href="/preview">Explore dashboard preview <span aria-hidden="true">↗</span></a>
+          <a class="landing-secondary-link" href="/register">New to KAMBAC? Register <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="landing-trust"><span class="trust-mark">✓</span><span>For members and authorized administrators</span></div>
+      </div>
+      <div class="landing-visual" aria-label="KAMBAC community">
+        <div class="visual-orbit orbit-outer"></div><div class="visual-orbit orbit-inner"></div>
+        <div class="visual-content">
+          <span class="visual-sun"></span>
+          <div class="field-lines"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="visual-hill hill-back"></div><div class="visual-hill hill-front"></div>
+          <div class="visual-caption"><span class="caption-dot"></span><span><strong>Rooted in community</strong><small>Building a connected future together</small></span></div>
+        </div>
+        <div class="floating-chip"><span>✦</span> Community first</div>
+      </div>
+      <div class="hero-glow"></div>
+    </section>
+    <section class="landing-about" id="about">
+      <div class="about-heading"><p class="eyebrow">ABOUT KAMBAC</p><h2>One community, moving forward.</h2></div>
+      <p class="about-copy">KAMBAC brings agrarian beneficiary farmers together around shared community and organizational goals. This portal supports members and authorized officers with a central place to access membership information and stay connected.</p>
+      <div class="about-divider"></div>
+      <div class="about-values">
+        <article><span class="value-icon">♧</span><div><strong>Farmer community</strong><p>Made to serve the people at the heart of KAMBAC.</p></div></article>
+        <article><span class="value-icon">◎</span><div><strong>Connected members</strong><p>Keep member information together in one place.</p></div></article>
+        <article><span class="value-icon">⌂</span><div><strong>Shared stewardship</strong><p>Supporting responsible coordination and growth.</p></div></article>
+      </div>
+    </section>
+  </main>
+  <footer class="landing-footer"><a class="footer-brand" href="/">KAMBAC <span>INTEGRATED MANAGEMENT SYSTEM</span></a><span>For our members and community.</span></footer>
+{{> footer }}
