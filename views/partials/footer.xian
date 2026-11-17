@@ -1,8 +1,8 @@
-<footer class="mt-auto bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+<footer class="mt-auto bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 py-6 text-center text-xs text-gray-500 dark:text-gray-400 transition-colors">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
     <div class="flex items-center gap-2">
       <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-      <span class="font-medium text-gray-700">KAMBAC Livestock System</span> &bull; <span>Powered by XianFire Framework & MySQL</span>
+      <span class="font-medium text-gray-700 dark:text-gray-300">KAMBAC Livestock System</span> &bull; <span>Powered by XianFire Framework & MySQL</span>
     </div>
     <div>
       <span>&copy; 2025 Mindoro State University &bull; Events-Driven Programming</span>
@@ -11,11 +11,104 @@
 </footer>
 
 <script>
-  // Initialize Lucide icons on DOM ready
+  // Dynamic Navigation & UI Controller
   document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Lucide Icons
     if (window.lucide) {
       window.lucide.createIcons();
     }
+
+    // 2. Theme Toggle Controller
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const sunIcon = document.getElementById('themeIconSun');
+    const moonIcon = document.getElementById('themeIconMoon');
+
+    function updateThemeIcons(isDark) {
+      if (sunIcon && moonIcon) {
+        if (isDark) {
+          sunIcon.classList.remove('hidden');
+          moonIcon.classList.add('hidden');
+        } else {
+          sunIcon.classList.add('hidden');
+          moonIcon.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Set initial icon state
+    const isCurrentlyDark = document.documentElement.classList.contains('dark');
+    updateThemeIcons(isCurrentlyDark);
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willBeDark = !document.documentElement.classList.contains('dark');
+        if (willBeDark) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('kambac_theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('kambac_theme', 'light');
+        }
+        updateThemeIcons(willBeDark);
+      });
+    }
+
+    // 3. Notification Dropdown Controller
+    const notifBtn = document.getElementById('notifDropdownBtn');
+    const notifMenu = document.getElementById('notifDropdownMenu');
+
+    if (notifBtn && notifMenu) {
+      notifBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notifMenu.classList.toggle('hidden');
+        if (userMenu) userMenu.classList.add('hidden');
+      });
+    }
+
+    // 4. User Profile Dropdown Controller
+    const userBtn = document.getElementById('userProfileBtn');
+    const userMenu = document.getElementById('userProfileMenu');
+
+    if (userBtn && userMenu) {
+      userBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('hidden');
+        if (notifMenu) notifMenu.classList.add('hidden');
+      });
+    }
+
+    // 5. Mobile Hamburger Navigation Controller
+    const mobileToggleBtn = document.getElementById('mobileNavToggleBtn');
+    const mobileDrawer = document.getElementById('mobileNavDrawer');
+    const menuOpenIcon = document.getElementById('mobileMenuOpenIcon');
+    const menuCloseIcon = document.getElementById('mobileMenuCloseIcon');
+
+    if (mobileToggleBtn && mobileDrawer) {
+      mobileToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !mobileDrawer.classList.contains('hidden');
+        if (isOpen) {
+          mobileDrawer.classList.add('hidden');
+          if (menuOpenIcon) menuOpenIcon.classList.remove('hidden');
+          if (menuCloseIcon) menuCloseIcon.classList.add('hidden');
+        } else {
+          mobileDrawer.classList.remove('hidden');
+          if (menuOpenIcon) menuOpenIcon.classList.add('hidden');
+          if (menuCloseIcon) menuCloseIcon.classList.remove('hidden');
+        }
+      });
+    }
+
+    // 6. Global Click Listener to Close Open Popups
+    document.addEventListener('click', (e) => {
+      if (notifMenu && !notifMenu.contains(e.target) && !notifBtn?.contains(e.target)) {
+        notifMenu.classList.add('hidden');
+      }
+      if (userMenu && !userMenu.contains(e.target) && !userBtn?.contains(e.target)) {
+        userMenu.classList.add('hidden');
+      }
+    });
   });
 </script>
 </body>

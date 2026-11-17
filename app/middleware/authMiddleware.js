@@ -15,7 +15,14 @@ export const isAdmin = (req, res, next) => {
 };
 
 export const attachUserToLocals = (req, res, next) => {
-  res.locals.currentUser = req.session ? req.session.user : null;
+  const user = req.session ? req.session.user : null;
+  if (user && user.name) {
+    const parts = user.name.trim().split(/\s+/);
+    user.initials = parts.length > 1 
+      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      : (parts[0][0] || 'U').toUpperCase();
+  }
+  res.locals.currentUser = user;
   res.locals.success_msg = req.flash ? req.flash('success_msg') : null;
   res.locals.error_msg = req.flash ? req.flash('error_msg') : null;
   next();

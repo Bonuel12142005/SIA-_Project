@@ -116,7 +116,7 @@
   </div>
 
   <!-- SECTION 6: ACTIVE LIVESTOCK GRID -->
-  <div class="mt-10">
+  <div id="livestock-section" class="mt-10 scroll-mt-20">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">

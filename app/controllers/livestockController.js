@@ -86,7 +86,7 @@ export const dashboard = async (req, res) => {
       },
       livestockList: formattedLivestock,
       members: members.map(m => m.toJSON()),
-      activeNav: 'dashboard'
+      activeNav: 'overview'
     });
   } catch (error) {
     console.error('Dashboard loading error:', error);
@@ -96,7 +96,7 @@ export const dashboard = async (req, res) => {
       stats: { totalLivestock: 0, healthyCount: 0, needsMonitoringCount: 0, formattedEstimatedValue: '0.00' },
       livestockList: [],
       members: [],
-      activeNav: 'dashboard'
+      activeNav: 'overview'
     });
   }
 };
