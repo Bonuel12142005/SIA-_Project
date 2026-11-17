@@ -6,6 +6,11 @@ import { isAuthenticated } from '../app/middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// Health Check Endpoint (for Docker / orchestrators)
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Public Authentication Routes
 router.get('/', (req, res) => res.redirect('/dashboard'));
 router.get('/login', authController.showLogin);

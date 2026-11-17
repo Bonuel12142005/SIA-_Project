@@ -1,0 +1,63 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: kambac_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: kambac_db
+      MYSQL_USER: kambac_user
+      MYSQL_PASSWORD: kambac_secure_password
+      MYSQL_ROOT_PASSWORD: kambac_root_password
+    ports:
+      - "${HOST_DB_PORT:-3308}:3306"
+    volumes:
+      - kambac_mysql_data:/var/lib/mysql
+    networks:
+      - kambac_network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kambac_app
+    restart: always
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      SESSION_SECRET: kambac_prod_session_secret_key_2025
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: kambac_db
+      DB_USER: kambac_user
+      DB_PASSWORD: kambac_secure_password
+      ADMIN_NAME: KAMBAC Administrator
+      ADMIN_EMAIL: admin@kambac.com
+      ADMIN_PASSWORD: AdminPassword123!
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - kambac_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  kambac_mysql_data:
+    name: kambac_mysql_data
+
+networks:
+  kambac_network:
+    name: kambac_network
+    driver: bridge
