@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+storage/logs/
+uploads/private/
+storage/uploads/*
+!storage/uploads/.gitkeep
+!storage/logs/.gitkeep

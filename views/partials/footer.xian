@@ -1,0 +1,22 @@
+<footer class="mt-auto bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-2">
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+      <span class="font-medium text-gray-700">KAMBAC Livestock System</span> &bull; <span>Powered by XianFire Framework & MySQL</span>
+    </div>
+    <div>
+      <span>&copy; 2025 Mindoro State University &bull; Events-Driven Programming</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Initialize Lucide icons on DOM ready
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  });
+</script>
+</body>
+</html>

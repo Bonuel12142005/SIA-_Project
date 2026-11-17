@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* KAMBAC Custom Livestock Theme */
+:root {
+  --primary-green: #15803d;
+  --primary-dark: #14532d;
+  --accent-emerald: #10b981;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+}

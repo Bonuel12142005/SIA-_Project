@@ -1,0 +1,30 @@
+{
+  "name": "kambac",
+  "version": "1.0.0",
+  "description": "KAMBAC Livestock Management System built with XianFire Framework and MySQL",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "xian-start": "node index.js",
+    "xian": "nodemon index.js",
+    "migrate": "node database/migrate.js",
+    "seed": "node database/seed.js",
+    "create:model": "node create.js model",
+    "create:controller": "node create.js controller",
+    "test": "node tests/test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.9.2",
+    "sequelize": "^6.37.3",
+    "bcrypt": "^5.1.0",
+    "express-session": "^1.17.3",
+    "connect-flash": "^0.1.1",
+    "hbs": "^4.2.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

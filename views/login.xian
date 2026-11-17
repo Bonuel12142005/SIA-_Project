@@ -1,0 +1,85 @@
+{{> head }}
+
+<div class="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+  
+  <!-- Decorative background elements -->
+  <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-forest-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="max-w-md w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/20 relative z-10">
+    
+    <!-- Logo & Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex p-3 rounded-2xl bg-forest-600 text-white shadow-lg mb-3">
+        <i data-lucide="shield-check" class="w-8 h-8"></i>
+      </div>
+      <h2 class="text-2xl font-black text-gray-900 tracking-tight">KAMBAC SYSTEM</h2>
+      <p class="text-xs text-forest-700 font-semibold tracking-wider uppercase mt-1">Livestock Management Portal</p>
+      <p class="text-xs text-gray-500 mt-2">Sign in to manage cooperative records & livestock inventory</p>
+    </div>
+
+    <!-- Error / Success alerts -->
+    {{#if error_msg}}
+    <div class="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
+      <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+      <span>{{ error_msg }}</span>
+    </div>
+    {{/if}}
+
+    {{#if success_msg}}
+    <div class="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 flex-shrink-0"></i>
+      <span>{{ success_msg }}</span>
+    </div>
+    {{/if}}
+
+    <!-- Login Form -->
+    <form action="/login" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Address</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+            <i data-lucide="mail" class="w-4 h-4"></i>
+          </div>
+          <input type="email" name="email" value="admin@kambac.com" required placeholder="name@domain.com" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-forest-500 focus:bg-white outline-none transition-all" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </div>
+          <input type="password" name="password" value="AdminPassword123!" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-forest-500 focus:bg-white outline-none transition-all" />
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" class="w-full py-3 px-4 bg-forest-600 hover:bg-forest-700 active:scale-[0.99] text-white font-bold rounded-xl shadow-lg shadow-forest-600/30 transition-all flex items-center justify-center gap-2 text-sm">
+          <span>Sign In to Dashboard</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </form>
+
+    <div class="mt-6 pt-5 border-t border-gray-100 text-center">
+      <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs text-gray-600 space-y-1 text-left">
+        <div class="font-bold text-gray-800 flex items-center gap-1">
+          <i data-lucide="key" class="w-3.5 h-3.5 text-forest-600"></i> Initial Default Credentials:
+        </div>
+        <p>Email: <span class="font-mono text-gray-900 font-semibold">admin@kambac.com</span></p>
+        <p>Password: <span class="font-mono text-gray-900 font-semibold">AdminPassword123!</span></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) window.lucide.createIcons();
+  });
+</script>
+</body>
+</html>

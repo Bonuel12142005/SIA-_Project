@@ -1,0 +1,53 @@
+<!-- Modern Top Navigation Bar -->
+<header class="bg-forest-800 text-white shadow-lg sticky top-0 z-40 border-b border-forest-900">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-forest-600 flex items-center justify-center shadow-md">
+          <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+            KAMBAC <span class="text-emerald-300 font-semibold text-xs uppercase px-2 py-0.5 bg-forest-900 rounded-full border border-forest-700">Livestock</span>
+          </span>
+          <p class="text-xs text-forest-200 hidden sm:block">Integrated Cooperative Management System</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-1">
+        <a href="/dashboard" class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-white hover:bg-forest-700">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="/members" class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-forest-100 hover:text-white hover:bg-forest-700">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Members</span>
+        </a>
+        <a href="/livestock/archived" class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-forest-100 hover:text-white hover:bg-forest-700">
+          <i data-lucide="archive" class="w-4 h-4"></i>
+          <span>Archived Records</span>
+        </a>
+      </nav>
+
+      <!-- Right User Menu & Actions -->
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 pl-3 border-l border-forest-700">
+          <div class="text-right hidden sm:block">
+            <p class="text-sm font-semibold text-white leading-tight">{{ currentUser.name }}</p>
+            <p class="text-xs text-emerald-300 capitalize">{{ currentUser.role }}</p>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-forest-600 text-white flex items-center justify-center font-bold text-sm border-2 border-forest-500 shadow-sm">
+            <i data-lucide="user" class="w-5 h-5"></i>
+          </div>
+          <a href="/logout" title="Sign Out" class="p-2 rounded-lg text-forest-200 hover:text-white hover:bg-forest-700 transition-colors">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>
