@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { Member, Livestock, LivestockHealthRecord, LivestockWeightHistory, LivestockArchiveHistory } from '../models/index.js';
+import { sequelize, Member, Livestock, LivestockHealthRecord, LivestockWeightHistory, LivestockArchiveHistory } from '../models/index.js';
 
 // Calculate animal age from birth date or acquisition date
 function formatAge(birthDate, dateAcquired) {
@@ -103,8 +103,11 @@ export const dashboard = async (req, res) => {
 
 /**
  * Register New Livestock (Add Livestock Modal)
+ * Handles both Standard Form POST and AJAX / JSON Submissions
  */
 export const store = async (req, res) => {
+  const isAjax = req.xhr || req.headers.accept?.includes('application/json') || req.is('application/json');
+
   try {
     const {
       member_id,
@@ -115,64 +118,142 @@ export const store = async (req, res) => {
       date_acquired,
       birth_date,
       initial_weight,
+      current_weight,
       health_status,
       estimated_value
     } = req.body;
 
-    if (!member_id || !animal_type || !date_acquired || initial_weight === undefined || !health_status || estimated_value === undefined) {
-      req.flash('error_msg', 'Please fill in all required fields.');
+    // 1. Validation: check required fields
+    if (!member_id) {
+      if (isAjax) return res.status(400).json({ success: false, message: 'Please select an owner/member.' });
+      req.flash('error_msg', 'Please select an owner/member.');
       return res.redirect('/dashboard');
     }
 
-    // Auto-generate Unique Livestock ID (e.g. LS-2025-0004)
-    const count = await Livestock.count();
-    const year = new Date().getFullYear();
-    const livestock_code = `LS-${year}-${String(count + 1).padStart(4, '0')}`;
+    if (!animal_type || !date_acquired) {
+      const msg = 'Animal type and acquisition date are required.';
+      if (isAjax) return res.status(400).json({ success: false, message: msg });
+      req.flash('error_msg', msg);
+      return res.redirect('/dashboard');
+    }
 
-    const numWeight = parseFloat(initial_weight) || 0;
+    // Verify member existence to prevent foreign key errors
+    const member = await Member.findByPk(member_id);
+    if (!member) {
+      const msg = 'Selected member does not exist in the database.';
+      if (isAjax) return res.status(400).json({ success: false, message: msg });
+      req.flash('error_msg', msg);
+      return res.redirect('/dashboard');
+    }
+
+    // 2. Format and sanitize values
+    const numWeight = parseFloat(initial_weight !== undefined && initial_weight !== '' ? initial_weight : (current_weight || 0)) || 0;
+    const numCurrentWeight = parseFloat(current_weight !== undefined && current_weight !== '' ? current_weight : numWeight) || numWeight;
     const numValue = parseFloat(estimated_value) || 0;
 
-    // Create Livestock in MySQL
-    const newLivestock = await Livestock.create({
-      livestock_code,
-      member_id,
-      animal_name: animal_name || `${animal_type} #${count + 1}`,
-      animal_type,
-      breed: breed || 'Standard / Local',
-      sex: sex || 'Male',
-      date_acquired,
-      birth_date: birth_date || null,
-      initial_weight: numWeight,
-      current_weight: numWeight,
-      health_status,
-      estimated_value: numValue,
-      archive_status: 'active'
+    // Validate enum values
+    const validSexes = ['Male', 'Female', 'Unknown'];
+    const sanitizedSex = validSexes.includes(sex) ? sex : 'Male';
+
+    const validHealthStatuses = ['Healthy', 'Under Treatment', 'Critical', 'Needs Monitoring', 'Vaccinated'];
+    const sanitizedHealthStatus = validHealthStatuses.includes(health_status) ? health_status : 'Healthy';
+
+    // 3. Collision-safe Livestock Code Generation using MAX(id)
+    const maxItem = await Livestock.findOne({
+      order: [['id', 'DESC']],
+      attributes: ['id']
+    });
+    const nextSeq = (maxItem ? Number(maxItem.id) : 0) + 1;
+    const year = new Date().getFullYear();
+    let livestock_code = `LS-${year}-${String(nextSeq).padStart(4, '0')}`;
+
+    // Ensure uniqueness in case of race condition or custom codes
+    let counter = nextSeq;
+    while (await Livestock.findOne({ where: { livestock_code } })) {
+      counter++;
+      livestock_code = `LS-${year}-${String(counter).padStart(4, '0')}`;
+    }
+
+    const resolvedName = animal_name && animal_name.trim() !== '' 
+      ? animal_name.trim() 
+      : `${animal_type} #${counter}`;
+
+    // 4. Execute MySQL Transaction for complete data consistency
+    const result = await sequelize.transaction(async (t) => {
+      // a. Insert Livestock Record
+      const livestock = await Livestock.create({
+        livestock_code,
+        member_id,
+        animal_name: resolvedName,
+        animal_type: animal_type.trim(),
+        breed: breed ? breed.trim() : 'Standard / Local',
+        sex: sanitizedSex,
+        date_acquired,
+        birth_date: birth_date && birth_date.trim() !== '' ? birth_date : null,
+        initial_weight: numWeight,
+        current_weight: numCurrentWeight,
+        health_status: sanitizedHealthStatus,
+        estimated_value: numValue,
+        archive_status: 'active'
+      }, { transaction: t });
+
+      // b. Insert Initial Weight History Record
+      await LivestockWeightHistory.create({
+        livestock_id: livestock.id,
+        weight: numWeight,
+        recorded_date: date_acquired,
+        remarks: 'Initial registered intake weight'
+      }, { transaction: t });
+
+      // c. Insert Initial Health Record
+      await LivestockHealthRecord.create({
+        livestock_id: livestock.id,
+        health_condition: sanitizedHealthStatus,
+        diagnosis: 'Initial registration inspection',
+        treatment: 'Standard intake assessment',
+        record_date: date_acquired,
+        remarks: 'Livestock registered into KAMBAC database'
+      }, { transaction: t });
+
+      return livestock;
     });
 
-    // Create Initial Weight History record
-    await LivestockWeightHistory.create({
-      livestock_id: newLivestock.id,
-      weight: numWeight,
-      recorded_date: date_acquired,
-      remarks: 'Initial registered weight'
-    });
+    console.log(`✅ [MySQL] Successfully registered livestock ID: ${result.id} (${result.livestock_code}) for Member #${member_id}`);
 
-    // Create Initial Health Record
-    await LivestockHealthRecord.create({
-      livestock_id: newLivestock.id,
-      health_condition: health_status,
-      diagnosis: 'Initial intake and inspection',
-      treatment: 'General health checkup',
-      record_date: date_acquired,
-      remarks: 'Animal registered into KAMBAC cooperative database'
-    });
+    if (isAjax) {
+      return res.status(201).json({
+        success: true,
+        message: `Livestock ${result.livestock_code} (${result.animal_name}) registered successfully!`,
+        data: result
+      });
+    }
 
-    req.flash('success_msg', `Livestock ${livestock_code} registered successfully!`);
-    res.redirect('/dashboard');
+    req.flash('success_msg', `Livestock ${result.livestock_code} (${result.animal_name}) registered successfully!`);
+    return res.redirect('/dashboard');
+
   } catch (error) {
-    console.error('Create livestock error:', error);
-    req.flash('error_msg', 'Failed to register livestock: ' + error.message);
-    res.redirect('/dashboard');
+    console.error('❌ [MySQL] Create livestock error:', error);
+    
+    // Check for duplicate key constraint
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const msg = 'A livestock record with this identifier already exists.';
+      if (isAjax) return res.status(409).json({ success: false, message: msg });
+      req.flash('error_msg', msg);
+      return res.redirect('/dashboard');
+    }
+
+    // Check for foreign key constraint
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      const msg = 'Invalid member specified. Foreign key constraint failed.';
+      if (isAjax) return res.status(400).json({ success: false, message: msg });
+      req.flash('error_msg', msg);
+      return res.redirect('/dashboard');
+    }
+
+    const clientMsg = 'Failed to register livestock: ' + (error.message || 'Database error occurred.');
+    if (isAjax) return res.status(500).json({ success: false, message: clientMsg });
+    req.flash('error_msg', clientMsg);
+    return res.redirect('/dashboard');
   }
 };
 
