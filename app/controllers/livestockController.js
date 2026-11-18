@@ -29,6 +29,7 @@ export const dashboard = async (req, res) => {
   try {
     // 1. Fetch Dynamic Statistics from MySQL
     const totalLivestock = await Livestock.count({ where: { archive_status: 'active' } });
+    const archivedCount = await Livestock.count({ where: { archive_status: 'archived' } });
     const healthyCount = await Livestock.count({
       where: {
         archive_status: 'active',
@@ -77,6 +78,7 @@ export const dashboard = async (req, res) => {
       title: 'KAMBAC Livestock Management System - Dashboard',
       stats: {
         totalLivestock,
+        archivedCount,
         healthyCount,
         needsMonitoringCount,
         formattedEstimatedValue: Number(totalEstimatedValue).toLocaleString('en-PH', {
@@ -93,7 +95,7 @@ export const dashboard = async (req, res) => {
     req.flash('error_msg', 'Failed to load dashboard data: ' + error.message);
     res.render('dashboard', {
       title: 'KAMBAC Dashboard',
-      stats: { totalLivestock: 0, healthyCount: 0, needsMonitoringCount: 0, formattedEstimatedValue: '0.00' },
+      stats: { totalLivestock: 0, archivedCount: 0, healthyCount: 0, needsMonitoringCount: 0, formattedEstimatedValue: '0.00' },
       livestockList: [],
       members: [],
       activeNav: 'overview'
@@ -393,8 +395,8 @@ export const archive = async (req, res) => {
       performed_by: req.session?.user?.name || 'Administrator'
     });
 
-    req.flash('success_msg', `Livestock ${livestock.livestock_code} has been moved to archive.`);
-    res.redirect('/dashboard');
+    req.flash('success_msg', `Livestock ${livestock.livestock_code} has been moved to archive. You can retrieve it anytime from the Archived section.`);
+    res.redirect('/livestock/archived');
   } catch (error) {
     console.error('Archive livestock error:', error);
     req.flash('error_msg', 'Failed to archive livestock: ' + error.message);
