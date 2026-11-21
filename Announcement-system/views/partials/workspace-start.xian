@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#046A38"><title>{{title}} | KAMBAC Announcements</title><link rel="stylesheet" href="/announcements.css"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>try{document.documentElement.dataset.theme=localStorage.getItem('kambac-theme')||'light'}catch(e){document.documentElement.dataset.theme='light'}</script><script src="/workspace.js" defer></script><script src="/announcement-form.js" defer></script></head>
+<body class="announcement-app"><a class="skip-link" href="#main-content">Skip to content</a>
+<header class="kims-header">
+  <div class="kims-nav-inner">
+    <a class="kims-brand" href="/announcements" aria-label="KAMBAC announcements home"><img src="/kambac-mark.svg" alt="" width="38" height="38"><span><strong>KAMBAC</strong></span></a>
+    <nav class="kims-nav" id="kims-nav" aria-label="Main navigation">
+      <a href="/announcements" class="kims-nav-link {{#if activeAnnouncements}}{{#unless (eq title 'Create announcement')}}active{{/unless}}{{/if}}" {{#if (eq title 'Announcements')}}aria-current="page"{{/if}}>{{> icon name="announce"}}<span>Announcements</span></a>
+      {{#if canPost}}<a href="/announcements/new" class="kims-nav-link {{#if (eq title 'Create announcement')}}active{{/if}}" {{#if (eq title 'Create announcement')}}aria-current="page"{{/if}}>{{> icon name="plus"}}<span>Create announcement</span></a>{{/if}}
+      <a href="/notifications" class="kims-nav-link {{#if activeNotifications}}active{{/if}}" {{#if activeNotifications}}aria-current="page"{{/if}}>{{> icon name="bell"}}<span>Notifications</span></a>
+    </nav>
+    <div class="kims-actions">
+      <button class="kims-icon-button" id="themeToggle" type="button" aria-label="Switch color theme" title="Switch color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg></button>
+      <a class="kims-icon-button kims-bell" href="/notifications" aria-label="Notifications, {{unreadCount}} unread">{{> icon name="bell"}}{{#if unreadCount}}<span class="kims-count">{{unreadCount}}</span>{{/if}}</a>
+      <details class="account-menu"><summary aria-label="Account menu"><span class="avatar small">{{account.initials}}</span><span class="user-copy"><strong>{{account.name}}</strong><small>{{account.role}}</small></span>{{> icon name="chevron"}}</summary><div class="account-dropdown"><span class="dropdown-label">SIGNED IN AS</span><strong>{{account.name}}</strong><a href="/account">{{> icon name="user"}}My account</a><a href="/logout" data-confirm-logout>{{> icon name="logout"}}Sign out</a></div></details>
+      <button class="kims-icon-button kims-menu-button" type="button" data-toggle-nav aria-controls="kims-nav" aria-expanded="false" aria-label="Open navigation">{{> icon name="menu"}}</button>
+    </div>
+  </div>
+</header>
+<div class="workspace"><main class="main-content" id="main-content">
+{{#if success_msg}}<div class="alert success" role="status">{{> icon name="check"}}<span>{{success_msg}}</span></div>{{/if}}
+{{#if error_msg}}<div class="alert error" role="alert"><span>{{error_msg}}</span></div>{{/if}}

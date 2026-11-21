@@ -1,0 +1,106 @@
+{{> workspace-start}}
+<script src="https://cdn.tailwindcss.com"></script>
+
+
+  
+  <main class="min-h-[calc(100vh-4rem)] py-6">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      
+      <!-- Back Button -->
+      <div class="mb-6">
+        <a href="/announcements" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-emerald-600">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Announcements
+        </a>
+      </div>
+
+      <!-- Announcement Card with Green Top Accent -->
+      <div class="overflow-hidden rounded-2xl border border-slate-200/80 border-t-4 border-t-[#046A38] bg-white p-8 shadow-sm">
+        
+        <!-- Title -->
+        <h1 class="mb-5 text-3xl font-black leading-tight text-slate-900">{{announcement.title}}</h1>
+        
+        <!-- Meta Information -->
+        <div class="mb-5 flex flex-wrap items-center gap-4 border-b border-slate-200 pb-5">
+          <!-- Date -->
+          <div class="flex items-center gap-2 text-sm text-slate-600">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span class="font-medium">{{publishDate}}</span>
+          </div>
+          
+          <!-- Author -->
+          <div class="flex items-center gap-2 text-sm text-slate-600">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span class="font-medium">Posted by {{authorName}}</span>
+          </div>
+          
+          <!-- Priority Badge -->
+          {{#if announcement.priority}}
+            {{#if (eq announcement.priority 'high')}}
+              <span class="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-rose-700">
+                High Priority
+              </span>
+            {{else if (eq announcement.priority 'urgent')}}
+              <span class="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-amber-700">
+                Urgent Priority
+              </span>
+            {{else}}
+              <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-[#046A38]">
+                Normal Priority
+              </span>
+            {{/if}}
+          {{/if}}
+        </div>
+        
+        <!-- Content Body -->
+        <div class="mb-6 space-y-4 text-base leading-relaxed text-slate-700">
+          {{#if messageParagraphs}}
+            {{#each messageParagraphs}}
+              <p>{{this}}</p>
+            {{/each}}
+          {{else if announcement.message}}
+            <p>{{announcement.message}}</p>
+          {{else if announcement.content}}
+            <p>{{announcement.content}}</p>
+          {{else if announcement.body}}
+            <p>{{announcement.body}}</p>
+          {{else}}
+            <p>No content available.</p>
+          {{/if}}
+        </div>
+        
+        <!-- Action Buttons (Admin Only) -->
+        {{#if isOwner}}
+        <div class="flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5">
+          <button onclick="window.location.href='/announcements/{{announcement.id}}/edit'" class="inline-flex items-center gap-2 rounded-xl bg-[#046A38] px-4 py-2.5 text-sm font-semibold !text-white shadow-sm transition hover:bg-emerald-800">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit
+          </button>
+          <button form="archive-form" type="submit" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+            {{#if announcement.archivedAt}}Restore{{else}}Archive{{/if}}
+          </button>
+          <button form="delete-form" type="submit" class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+          </button>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </main>
+{{#if isOwner}}<form id="archive-form" method="post" action="/announcements/{{announcement.id}}/{{#if announcement.archivedAt}}restore{{else}}archive{{/if}}"><input type="hidden" name="_csrf" value="{{csrf}}"></form><form id="delete-form" method="post" action="/announcements/{{announcement.id}}/delete" data-confirm-delete><input type="hidden" name="_csrf" value="{{csrf}}"></form>{{/if}}
+{{#if markRead}}<script>fetch('/announcements/mark-read/{{announcement.id}}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_csrf:'{{csrf}}'})}).catch(()=>{});</script>{{/if}}
+{{> workspace-end}}

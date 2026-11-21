@@ -1,0 +1,394 @@
+{{> workspace-start}}
+<script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Light mode overrides - MAIN CONTENT ONLY, SIDEBAR STAYS DARK */
+        body.light-mode {
+            background: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0) !important;
+            color: #0f172a !important;
+        }
+        
+        body.light-mode main {
+            background-color: #F3F4F6 !important;
+        }
+        
+        body.light-mode main .text-white,
+        body.light-mode main h2.text-white {
+            color: #0f172a !important;
+        }
+        
+        body.light-mode main .text-gray-400,
+        body.light-mode main .text-gray-500 {
+            color: #64748b !important;
+        }
+        
+        body.light-mode main .text-gray-100 {
+            color: #1e293b !important;
+        }
+        
+        body.light-mode main .main-content-card,
+        body.light-mode main .settings-card {
+            background-color: white !important;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #046A38 !important;
+        }
+        
+        body.light-mode main .input-field,
+        body.light-mode main .textarea-field,
+        body.light-mode main .select-field {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        
+        body.light-mode main .action-bar {
+            background-color: white !important;
+            border-top-color: #e2e8f0;
+        }
+        
+        body.light-mode main .input-label,
+        body.light-mode main .helper-text {
+            color: #475569 !important;
+        }
+
+        .page-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 0.875rem 2rem;
+        }
+        
+        body.light-mode .page-header {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-bottom-color: #e2e8f0;
+        }
+        
+        body.light-mode .page-header h1 {
+            color: #0f172a !important;
+        }
+
+        .form-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            align-items: start;
+            gap: 1.5rem;
+            max-width: 1400px;
+        }
+        .main-content-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            align-self: start;
+        }
+        .settings-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .settings-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #334155;
+        }
+        .settings-card h3 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .input-group {
+            margin-bottom: 0;
+        }
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9375rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #046A38;
+            ring: 2px;
+            ring-color: rgba(4, 106, 56, 0.2);
+        }
+        .input-field::placeholder {
+            color: #64748b;
+        }
+        .textarea-field {
+            min-height: 200px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        .char-counter {
+            text-align: right;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+        .char-counter.warning {
+            color: #f59e0b;
+        }
+        .char-counter.error {
+            color: #ef4444;
+        }
+        .helper-text {
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+        .helper-text i {
+            color: #046A38;
+            margin-right: 0.25rem;
+        }
+        .action-bar {
+            position: sticky;
+            bottom: 0;
+            background: #0f172a;
+            border-top: 1px solid #334155;
+            padding: 1.5rem 2rem;
+            margin: 2rem -2rem -2rem -2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-cancel {
+            background: #374151;
+            color: white;
+        }
+        .btn-cancel:hover {
+            background: #4b5563;
+        }
+        .required-indicator {
+            color: #ef4444;
+            margin-left: 0.25rem;
+        }
+        .validation-error {
+            color: #ef4444;
+            font-size: 0.8125rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .validation-error.show {
+            display: block;
+        }
+        .select-field {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 3rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        .back-link:hover {
+            color: #046A38;
+            background: #334155;
+            border-color: #046A38;
+        }
+        .back-link svg {
+            width: 1rem;
+            height: 1rem;
+        }
+        @media (max-width: 1024px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+
+        }
+    
+        .settings-column { align-self: start; min-width: 0; }
+        .settings-accordion.settings-card { padding: 0; overflow: hidden; }
+        .settings-accordion summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; cursor: pointer; font-size: 14px; font-weight: 700; color: #214833; }
+        .settings-accordion summary::-webkit-details-marker { display: none; }
+        .settings-accordion summary:hover { background: #f1f8f3; }
+        .settings-accordion summary:focus-visible { outline: 2px solid #046a38; outline-offset: -3px; }
+        .accordion-chevron { display: block; width: 9px; height: 9px; border-right: 2px solid #046a38; border-bottom: 2px solid #046a38; transform: rotate(45deg); transition: transform .2s ease; margin: 0 3px 4px 0; }
+        .settings-accordion[open] .accordion-chevron { transform: rotate(225deg); margin-top: 5px; }
+        .accordion-body { padding: 0 18px 18px; min-width: 0; }
+        .accordion-body label { display: block; margin-top: 12px; font-size: 13px; font-weight: 600; }
+        .accordion-body .input-field { margin-top: 6px; }
+        .accordion-body .helper-text { margin: 6px 0 10px; }
+        .accordion-body .recipient-list { max-height: 220px; overflow-y: auto; }
+        .accordion-body .recipient-list label, .accordion-body .pin-setting { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; }
+        .accordion-error { color: #b42318; font-size: 12px; margin: 8px 0; }
+        @supports (interpolate-size: allow-keywords) { .settings-accordion { interpolate-size: allow-keywords; } .settings-accordion::details-content { block-size: 0; overflow: clip; transition: block-size .22s ease, content-visibility .22s allow-discrete; } .settings-accordion[open]::details-content { block-size: auto; } }
+        @media (prefers-reduced-motion: reduce) { .accordion-chevron, .settings-accordion::details-content { transition: none; } }
+        html[data-theme=dark] .settings-accordion summary { color: #e6f2e9; }
+        html[data-theme=dark] .settings-accordion summary:hover { background: #253d2d; }
+        @media (max-width: 1024px) { .settings-column { order: initial; } }
+    </style>
+
+  
+  <main class="dashboard-pattern min-h-screen bg-slate-900/50">
+    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+
+        <!-- Main Content -->
+        <main class="min-w-0 flex-1 overflow-y-auto">
+            <div class="py-8">
+                <!-- Back Link -->
+                <a href="/announcements" class="back-link">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to announcements
+                </a>
+
+                <div class="kims-page-heading"><div><span class="kims-eyebrow">COMMUNITY UPDATES</span><h1>{{#if editing}}Edit announcement{{else}}Create announcement{{/if}}</h1><p>Share important information with your community.</p></div></div>
+                <!-- Form -->
+                {{#if formError}}<div role="alert" class="alert error">{{formError}}</div>{{/if}}
+<form id="announcementForm" data-error-section="{{formErrorSection}}" method="post" action="{{#if editing}}/announcements/{{announcement.id}}/edit{{else}}/announcements{{/if}}"><input type="hidden" name="_csrf" value="{{csrf}}">
+                    <input type="hidden" id="announcementId" value="{{announcement.id}}">
+                    
+                    <div class="form-layout">
+                        <!-- Left Column: Main Content -->
+                        <div class="main-content-card">
+                            <!-- Title Input -->
+                            <div class="input-group">
+                                <label class="input-label">
+                                    Title<span class="required-indicator">*</span>
+                                </label>
+                                <input type="text" 
+                                       id="titleInput"
+                                       name="title"
+                                       class="input-field" 
+                                       placeholder="Enter a clear and concise title"
+                                       maxlength="255"
+                                       value="{{announcement.title}}"
+                                       required>
+                                <div class="char-counter">
+                                    <span id="titleCounter">0</span>/255 characters
+                                </div>
+                                <div class="validation-error" id="titleError">Title is required</div>
+                            </div>
+
+                            <!-- Message Input -->
+                            <div class="input-group">
+                                <label class="input-label">
+                                    Message<span class="required-indicator">*</span>
+                                </label>
+                                <textarea id="messageInput"
+                                          name="content"
+                                          class="input-field textarea-field"
+                                          placeholder="Write your announcement message here. You can include details, instructions, dates, or any important information for the community."
+                                          required>{{announcement.content}}</textarea>
+                                <div class="char-counter">
+                                    <span id="messageCounter">0</span> characters (max 60,000 bytes)
+                                </div>
+                                <div class="validation-error" id="messageError">Message is required</div>
+                            </div>
+
+                            <!-- Additional Details (Optional) -->
+                            <div class="input-group">
+                                <label class="input-label">Category</label>
+                                <select id="categorySelect" name="category" class="input-field select-field">
+                                    <option value="general" {{#if (eq announcement.category 'general')}}selected{{/if}}>General Announcement</option>
+                                    <option value="meeting" {{#if (eq announcement.category 'meeting')}}selected{{/if}}>Meeting</option>
+                                    <option value="event" {{#if (eq announcement.category 'event')}}selected{{/if}}>Event</option>
+                                    <option value="notice" {{#if (eq announcement.category 'notice')}}selected{{/if}}>Notice</option>
+                                    <option value="reminder" {{#if (eq announcement.category 'reminder')}}selected{{/if}}>Reminder</option>
+                                    <option value="emergency" {{#if (eq announcement.category 'emergency')}}selected{{/if}}>Emergency</option>
+                                    {{#if legacyTraining}}<option value="training" {{#if (eq announcement.category 'training')}}selected{{/if}}>Training (existing category)</option>{{/if}}
+                                    <option value="deadline" {{#if (eq announcement.category 'deadline')}}selected{{/if}}>Deadline</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Settings -->
+                        <div class="settings-column" aria-label="Announcement settings">
+                          <details name="announcement-settings" class="settings-card settings-accordion" data-section="audience"><summary>Audience <span class="accordion-chevron" aria-hidden="true"></span></summary><div class="accordion-body">
+                            <label class="input-label" for="audienceSelect">Who should see this?</label>
+                            <select id="audienceSelect" name="audience" class="input-field select-field"><option value="all" {{#if (eq announcement.audience 'all')}}selected{{/if}}>All Members</option><option value="specific" {{#if (eq announcement.audience 'specific')}}selected{{/if}}>Specific Members</option></select>
+                            <p class="helper-text">Select which members can view this announcement.</p>
+                          </div></details>
+                          <details name="announcement-settings" class="settings-card settings-accordion" data-section="recipients"><summary>Selected Recipients <span class="accordion-chevron" aria-hidden="true"></span></summary><div class="accordion-body">
+                            <p class="helper-text">For Specific Members, select users or roles.</p><p id="recipientError" class="accordion-error" role="alert" hidden>Choose at least one recipient or role.</p>
+                            <div class="recipient-list">{{#each users}}<label><input type="checkbox" name="recipientIds" value="{{id}}" {{#if selected}}checked{{/if}}> {{name}} ({{role}})</label>{{/each}}{{#each roleChoices}}<label><input type="checkbox" name="recipientRoles" value="{{role}}" {{#if selected}}checked{{/if}}> All {{role}}</label>{{/each}}</div>
+                          </div></details>
+                          <details name="announcement-settings" class="settings-card settings-accordion" data-section="status"><summary>Status &amp; Priority <span class="accordion-chevron" aria-hidden="true"></span></summary><div class="accordion-body">
+                            <label>Status <select name="status" class="input-field"><option value="published" {{#if (eq announcement.status 'published')}}selected{{/if}}>Published</option><option value="draft" {{#if (eq announcement.status 'draft')}}selected{{/if}}>Draft</option></select></label>
+                            <label>Priority <select name="priority" class="input-field"><option value="normal" {{#if (eq announcement.priority 'normal')}}selected{{/if}}>Normal</option><option value="high" {{#if (eq announcement.priority 'high')}}selected{{/if}}>High</option><option value="urgent" {{#if (eq announcement.priority 'urgent')}}selected{{/if}}>Urgent</option></select></label>
+                            <label class="pin-setting"><input type="checkbox" name="pinned" value="true" {{#if announcement.pinned}}checked{{/if}}> Pin announcement</label>
+                          </div></details>
+                          <details name="announcement-settings" class="settings-card settings-accordion" data-section="event"><summary>Event Details <span class="accordion-chevron" aria-hidden="true"></span></summary><div class="accordion-body">
+                            <label>Event date and time<input type="datetime-local" name="eventDate" class="input-field" value="{{eventDateFormatted}}"></label><label>Event time<input name="eventTime" class="input-field" value="{{announcement.eventTime}}"></label><label>Location<input name="eventLocation" class="input-field" value="{{announcement.eventLocation}}"></label>
+                          </div></details>
+                          <details name="announcement-settings" class="settings-card settings-accordion" data-section="schedule"><summary>Schedule <span class="accordion-chevron" aria-hidden="true"></span></summary><div class="accordion-body">
+                            <label for="publishDateInput">Publish Date &amp; Time</label><input type="datetime-local" id="publishDateInput" name="publishDate" class="input-field" value="{{publishDateFormatted}}" required><p class="helper-text">When should this announcement become visible?</p>
+                            <label for="expiryDateInput">Expiry Date (Optional)</label><input type="datetime-local" id="expiryDateInput" name="expiryDate" class="input-field" value="{{expiryDateFormatted}}"><p class="helper-text">Leave empty for no expiration.</p>
+                          </div></details>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="action-bar">
+                        <div class="helper-text" style="margin: 0;">
+                            <i class="fas fa-asterisk" style="color: #ef4444; font-size: 0.5rem;"></i>
+                            Required fields
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" onclick="location.href='/announcements'" class="btn btn-cancel">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                            <button type="submit" id="submitBtn" class="btn bg-[#046A38] hover:bg-emerald-800 !text-white">
+                                <i class="fas fa-save"></i>
+                                <span id="submitBtnText">Save Announcement</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+  </main>
+<script src="/announcement-editor.js" defer></script>
+{{> workspace-end}}

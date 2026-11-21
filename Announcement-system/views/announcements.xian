@@ -1,0 +1,50 @@
+﻿{{> workspace-start}}
+<link rel="stylesheet" href="/announcement-inbox.css">
+<section class="directory-inbox" aria-labelledby="directory-heading">
+  <div class="directory-heading"><div><p class="directory-eyebrow">COMMUNITY UPDATES</p><h1 id="directory-heading">Announcements</h1><p>Updates shared with your community, all in one place.</p></div>{{#if isAdmin}}<a class="directory-create-button" href="/announcements/new">{{> icon name="plus"}} Create Announcement</a>{{/if}}</div>
+  <form id="filterForm" class="inbox-filters" method="get" action="/announcements">
+    <label class="inbox-search"><span class="sr-only">Search announcements</span>{{> icon name="search"}}<input type="search" name="search" placeholder="Search announcements..." value="{{searchQuery}}"></label>
+    <input type="hidden" name="status" value="{{statusFilter}}" hidden>
+    {{#if dateFilter.active}}<input type="hidden" name="date" value="{{dateFilter.mode}}" hidden>{{#if (eq dateFilter.mode 'custom')}}<input type="hidden" name="from" value="{{dateFilter.from}}" hidden><input type="hidden" name="to" value="{{dateFilter.to}}" hidden>{{/if}}{{/if}}
+    <button type="submit" class="inbox-filter-button">Search</button>{{#if hasFilters}}<a class="inbox-clear" href="{{clearSearchUrl}}">Clear</a>{{/if}}
+  </form>
+  <nav class="inbox-status-tabs" aria-label="Announcement status">
+    {{#each tabs}}<a href="{{url}}" class="inbox-status-tab {{#if active}}is-active{{/if}}" {{#if active}}aria-current="page"{{/if}}>{{label}} <span class="inbox-tab-count">{{count}}</span></a>{{/each}}
+  </nav>
+  <form class="inbox-date-filter" id="dateFilterForm" method="get" action="/announcements">
+    <input type="hidden" name="status" value="{{statusFilter}}" hidden>
+    {{#if searchQuery}}<input type="hidden" name="search" value="{{searchQuery}}" hidden>{{/if}}
+    <label class="date-select-label" for="dateFilter">Date Filter</label>
+    <select id="dateFilter" name="date">
+      <option value="all" {{#if (eq dateFilter.mode 'all')}}selected{{/if}}>All Dates</option>
+      <option value="today" {{#if (eq dateFilter.mode 'today')}}selected{{/if}}>Today</option>
+      <option value="7days" {{#if (eq dateFilter.mode '7days')}}selected{{/if}}>Last 7 Days</option>
+      <option value="30days" {{#if (eq dateFilter.mode '30days')}}selected{{/if}}>Last 30 Days</option>
+      <option value="custom" {{#if (eq dateFilter.mode 'custom')}}selected{{/if}}>Custom Date Range</option>
+    </select>
+    <div class="date-custom-range" id="customDateRange" {{#unless (eq dateFilter.mode 'custom')}}hidden{{/unless}}>
+      <label>From Date<input type="date" name="from" value="{{#if (eq dateFilter.mode 'custom')}}{{dateFilter.from}}{{/if}}" {{#if (eq dateFilter.mode 'custom')}}required{{else}}disabled{{/if}}></label>
+      <label>To Date<input type="date" name="to" value="{{#if (eq dateFilter.mode 'custom')}}{{dateFilter.to}}{{/if}}" {{#if (eq dateFilter.mode 'custom')}}required{{else}}disabled{{/if}}></label>
+      <button class="inbox-filter-button" type="submit">Apply</button>
+    </div>
+    {{#if dateFilter.active}}<a class="inbox-clear" href="{{clearDateUrl}}">Clear Date Filter</a>{{/if}}
+    <noscript><button class="inbox-filter-button" type="submit">Apply date filter</button></noscript>
+  </form>
+  <section class="inbox-list" aria-label="Announcement inbox">
+    <div class="inbox-list-heading"><div><h2>Inbox</h2><span>Announcements</span></div><span>{{pagination.total}} {{#if (eq pagination.total 1)}}update{{else}}updates{{/if}}</span></div>
+    {{#each announcements}}
+    <a class="inbox-row {{#if unread}}is-unread{{else}}is-read{{/if}}" href="/announcements/{{id}}/view">
+      <span class="inbox-indicator" aria-hidden="true"></span><span class="sr-only">{{#if hasReadStatus}}{{#if unread}}Unread{{else}}Read{{/if}}{{else}}No notification read status{{/if}}: </span>
+      <span class="inbox-author">{{authorName}}</span>
+      <span class="inbox-message"><span class="inbox-title">{{title}}</span><span class="inbox-excerpt">{{excerpt}}</span></span>
+      <span class="inbox-tags"><span class="inbox-tag inbox-tag-{{status}}">{{status}}</span><span class="inbox-tag inbox-audience">{{audienceLabel}}</span></span>
+      <span class="inbox-date">{{publishDate}}</span>
+    </a>
+    {{else}}
+    <div class="inbox-empty">{{> icon name="announce"}}<h2>No {{statusFilter}} announcements found</h2><p>{{#if dateFilter.active}}No announcements match the selected date range.{{else if searchQuery}}Try a different search.{{else}}There are no announcements in this section.{{/if}}</p>{{#if hasFilters}}<a href="{{clearSearchUrl}}">Clear search</a>{{/if}}</div>
+    {{/each}}
+    {{#if announcements.length}}<nav class="inbox-pagination" aria-label="Announcement pages"><span>Showing {{pagination.start}}–{{pagination.end}} of {{pagination.total}}</span><div>{{#if hasPrevPage}}<a href="{{previousPage}}" aria-label="Previous page">Previous</a>{{else}}<span aria-disabled="true">Previous</span>{{/if}}<span class="inbox-page">{{currentPage}} / {{totalPages}}</span>{{#if hasNextPage}}<a href="{{nextPage}}" aria-label="Next page">Next</a>{{else}}<span aria-disabled="true">Next</span>{{/if}}</div></nav>{{/if}}
+  </section>
+</section>
+<script src="/announcement-date-filter.js" defer></script>
+{{> workspace-end}}
