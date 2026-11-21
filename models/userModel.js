@@ -28,19 +28,19 @@ import { sequelize } from "./db.js";
 
 export const User = sequelize.define("User", {
   name: { type: DataTypes.STRING, allowNull: false },
-  email: { type: DataTypes.STRING, allowNull: false, set(value) { this.setDataValue("email", value?.trim().toLowerCase()); } },
-  username: { type: DataTypes.STRING(32), allowNull: true, set(value) { this.setDataValue("username", value?.trim().toLowerCase()); } },
+  email: { type: DataTypes.STRING(254), allowNull: false, unique: true, set(value) { this.setDataValue("email", value?.trim().toLowerCase()); } },
+  username: { type: DataTypes.STRING(32), allowNull: true, unique: true, set(value) { this.setDataValue("username", value?.trim().toLowerCase()); } },
   password: { type: DataTypes.STRING, allowNull: false },
   role: { type: DataTypes.ENUM("admin", "member"), allowNull: false, defaultValue: "member" },
-  memberId: { type: DataTypes.STRING(32), allowNull: true },
+  memberId: { type: DataTypes.STRING(32), allowNull: true, unique: true },
   contactNumber: { type: DataTypes.STRING(40), allowNull: true },
   address: { type: DataTypes.TEXT, allowNull: true },
   membershipDate: { type: DataTypes.DATEONLY, allowNull: false, defaultValue: DataTypes.NOW },
-  status: { type: DataTypes.ENUM("Active", "Inactive"), allowNull: false, defaultValue: "Active" }
+  status: { type: DataTypes.ENUM("Active", "Inactive", "Pending"), allowNull: false, defaultValue: "Active" }
 }, {
   hooks: {
     afterCreate: async (user, options) => {
-      if (!user.memberId && user.role === "member") {
+      if (!user.memberId && user.role === "member" && user.status === "Active") {
         const year = new Date(`${user.membershipDate}T00:00:00`).getFullYear();
         user.memberId = `KMB-${year}-${String(user.id).padStart(4, "0")}`;
         await user.save({ fields: ["memberId"], hooks: false, transaction: options.transaction });

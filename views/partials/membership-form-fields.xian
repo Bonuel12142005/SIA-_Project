@@ -1,0 +1,58 @@
+<div class="application-form-brand">
+  <span class="brand-mark">K</span>
+  <span><strong>KAMBAC</strong><small>Integrated Management System</small></span>
+</div>
+<div class="application-form-title">
+  <p class="eyebrow">MEMBERSHIP REGISTRATION</p>
+  <h2>Membership Registration / Application Form</h2>
+  <p class="page-subtitle">Please complete the information below for membership review.</p>
+</div>
+
+<div class="form-section-title"><span class="form-section-icon">01</span><span><strong>Pangalan / Name</strong><small>Applicant's full legal name</small></span></div>
+<div class="form-grid">
+  <label class="form-field"><span>First name <b>*</b></span><input name="firstName" value="{{application.firstName}}" maxlength="60" autocomplete="given-name" required>{{#if errors.firstName}}<small class="field-error">{{errors.firstName}}</small>{{/if}}</label>
+  <label class="form-field"><span>Middle name</span><input name="middleName" value="{{application.middleName}}" maxlength="60" autocomplete="additional-name"></label>
+  <label class="form-field"><span>Last name <b>*</b></span><input name="lastName" value="{{application.lastName}}" maxlength="60" autocomplete="family-name" required>{{#if errors.lastName}}<small class="field-error">{{errors.lastName}}</small>{{/if}}</label>
+  <label class="form-field"><span>Suffix</span><input name="suffix" value="{{application.suffix}}" maxlength="20" placeholder="Jr., Sr., III"></label>
+  {{#if errors.fullName}}<p class="field-error form-field-wide" role="alert">{{errors.fullName}}</p>{{/if}}
+</div>
+
+<div class="form-section-title form-section-spaced"><span class="form-section-icon">02</span><span><strong>Address</strong><small>Current residential address</small></span></div>
+<div class="form-grid">
+  <label class="form-field form-field-wide"><span>House / street / complete address <b>*</b></span><textarea name="address" rows="3" minlength="5" maxlength="1000" autocomplete="street-address" required>{{application.address}}</textarea>{{#if errors.address}}<small class="field-error">{{errors.address}}</small>{{/if}}</label>
+  <label class="form-field"><span>Barangay</span><input name="barangay" value="{{application.barangay}}" maxlength="100"></label>
+  <label class="form-field"><span>Municipality / City</span><input name="municipality" value="{{application.municipality}}" maxlength="100"></label>
+  <label class="form-field"><span>Province</span><input name="province" value="{{application.province}}" maxlength="100"></label>
+</div>
+
+<div class="form-section-title form-section-spaced"><span class="form-section-icon">03</span><span><strong>Personal Details</strong><small>Personal and contact information</small></span></div>
+<div class="form-grid">
+  <label class="form-field"><span>Date of birth</span><input name="birthDate" type="date" value="{{application.birthDate}}" max="{{today}}">{{#if errors.birthDate}}<small class="field-error">{{errors.birthDate}}</small>{{/if}}</label>
+  <label class="form-field"><span>Place of birth</span><input name="placeOfBirth" value="{{application.placeOfBirth}}" maxlength="200"></label>
+  <label class="form-field"><span>Sex</span><select name="sex"><option value="">Select</option><option value="Male" {{#if application.sexMale}}selected{{/if}}>Male</option><option value="Female" {{#if application.sexFemale}}selected{{/if}}>Female</option><option value="Prefer not to say" {{#if application.sexOther}}selected{{/if}}>Prefer not to say</option></select>{{#if errors.sex}}<small class="field-error">{{errors.sex}}</small>{{/if}}</label>
+  <label class="form-field"><span>Civil status</span><select name="civilStatus"><option value="">Select</option><option value="Single" {{#if application.civilSingle}}selected{{/if}}>Single</option><option value="Married" {{#if application.civilMarried}}selected{{/if}}>Married</option><option value="Widowed" {{#if application.civilWidowed}}selected{{/if}}>Widowed</option><option value="Separated" {{#if application.civilSeparated}}selected{{/if}}>Separated</option></select>{{#if errors.civilStatus}}<small class="field-error">{{errors.civilStatus}}</small>{{/if}}</label>
+  <label class="form-field form-field-wide"><span>Contact number <b>*</b></span><input name="contactNumber" type="tel" value="{{application.contactNumber}}" minlength="7" maxlength="40" autocomplete="tel" placeholder="+63 9XX XXX XXXX" required>{{#if errors.contactNumber}}<small class="field-error">{{errors.contactNumber}}</small>{{/if}}</label>
+</div>
+
+<div class="form-section-title form-section-spaced"><span class="form-section-icon">04</span><span><strong>Informasyon sa Pamilya / Family Information</strong><small>Immediate family details</small></span></div>
+<div class="form-grid">
+  <label class="form-field"><span>Father's name</span><input name="fatherName" value="{{application.fatherName}}" maxlength="120"></label>
+  <label class="form-field"><span>Mother's name</span><input name="motherName" value="{{application.motherName}}" maxlength="120"></label>
+  <label class="form-field"><span>Spouse's name</span><input name="spouseName" value="{{application.spouseName}}" maxlength="120"></label>
+  <label class="form-field"><span>Spouse's occupation</span><input name="spouseOccupation" value="{{application.spouseOccupation}}" maxlength="120"></label>
+  <label class="form-field"><span>Number of children</span><input name="numberOfChildren" type="number" min="0" max="50" value="{{application.numberOfChildren}}">{{#if errors.numberOfChildren}}<small class="field-error">{{errors.numberOfChildren}}</small>{{/if}}</label>
+</div>
+
+<div class="form-section-title form-section-spaced"><span class="form-section-icon">05</span><span><strong>Membership Information</strong><small>Occupation and membership details</small></span></div>
+<div class="form-grid">
+  <label class="form-field"><span>Occupation</span><input name="occupation" value="{{application.occupation}}" maxlength="120"></label>
+  <label class="form-field"><span>Employer / business</span><input name="employer" value="{{application.employer}}" maxlength="120"></label>
+  <label class="form-field"><span>Membership type</span><input name="memberType" value="{{application.memberType}}" maxlength="60" placeholder="e.g. Regular"></label>
+  <label class="form-field"><span>Membership date <b>*</b></span><input name="membershipDate" type="date" value="{{application.membershipDate}}" max="{{today}}" required>{{#if errors.membershipDate}}<small class="field-error">{{errors.membershipDate}}</small>{{/if}}</label>
+</div>
+
+<div class="form-section-title form-section-spaced"><span class="form-section-icon">06</span><span><strong>Applicant's Declaration &amp; Signature</strong><small>I certify that the information provided is true and correct.</small></span></div>
+<div class="form-grid">
+  <label class="form-field form-field-wide"><span>Applicant signature (type full name) {{#unless isEdit}}<b>*</b>{{/unless}}</span><input name="signatureName" value="{{application.signatureName}}" maxlength="120" autocomplete="name" {{#unless isEdit}}required{{/unless}}>{{#if errors.signatureName}}<small class="field-error">{{errors.signatureName}}</small>{{/if}}</label>
+  <label class="form-field"><span>Date signed {{#unless isEdit}}<b>*</b>{{/unless}}</span><input name="signedAt" type="date" value="{{application.signedAt}}" max="{{today}}" {{#unless isEdit}}required{{/unless}}>{{#if errors.signedAt}}<small class="field-error">{{errors.signedAt}}</small>{{/if}}</label>
+</div>

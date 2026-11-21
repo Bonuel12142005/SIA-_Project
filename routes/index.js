@@ -32,6 +32,8 @@ router.get("/", homePage);
 import {
   loginPage,
   registerPage,
+  membershipApplicationPage,
+  submitMembershipApplication,
   forgotPasswordPage,
   dashboardPage,
   dashboardPreviewPage,
@@ -73,6 +75,8 @@ router.get("/login", loginPage);
 router.post("/login", loginUser);
 router.get("/register", registerPage);
 router.post("/register", registerUser);
+router.get("/member/application", membershipApplicationPage);
+router.post("/member/application", submitMembershipApplication);
 router.get("/forgot-password", forgotPasswordPage);
 router.get("/preview", dashboardPreviewPage);
 router.get("/dashboard", dashboardPage);

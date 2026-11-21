@@ -1,13 +1,26 @@
+import bcrypt from "bcrypt";
 import { Op, UniqueConstraintError } from "sequelize";
 import { User } from "../models/userModel.js";
 import { Member, sequelize } from "../models/memberModel.js";
 import { AuditLog } from "../models/auditLogModel.js";
 import { MembershipPayment } from "../models/membershipPaymentModel.js";
+import {
+  membershipFormValues,
+  membershipToday,
+  normalizeMembershipForm,
+  validateMembershipForm
+} from "./membershipForm.js";
 
 const MANAGER_ROLES = ["admin"];
-const STATUSES = ["Active", "Inactive", "Suspended"];
+const STATUSES = ["Active", "Inactive", "Suspended", "Pending"];
 const TODAY = () => new Date().toISOString().slice(0, 10);
-const PROFILE_FIELDS = ["id", "memberId", "firstName", "lastName", "fullName", "address", "contactNumber", "contactDetails", "membershipDate", "status", "createdAt", "updatedAt", "archivedAt"];
+const PROFILE_FIELDS = [
+  "id", "memberId", "firstName", "middleName", "lastName", "suffix", "fullName",
+  "address", "barangay", "municipality", "province", "contactNumber", "contactDetails",
+  "birthDate", "placeOfBirth", "sex", "civilStatus", "spouseName", "spouseOccupation",
+  "fatherName", "motherName", "numberOfChildren", "occupation", "employer", "memberType",
+  "membershipDate", "status", "signatureName", "signedAt", "createdAt", "updatedAt", "archivedAt"
+];
 
 const getCurrentUser = async (req) => {
   if (!req.session.userId) return null;
@@ -18,41 +31,26 @@ const getCurrentUser = async (req) => {
 const isManager = (user) => user && MANAGER_ROLES.includes(user.role);
 const validMemberId = (value) => typeof value === "string" && /^KMB-\d{4}-\d{4,}$/.test(value);
 const normalizeInput = (body) => ({
-  firstName: typeof body.firstName === "string" ? body.firstName.trim() : "",
-  lastName: typeof body.lastName === "string" ? body.lastName.trim() : "",
-  address: typeof body.address === "string" ? body.address.trim() : "Carmundo, Bongabong, Oriental Mindoro",
-  contactNumber: typeof body.contactNumber === "string" ? body.contactNumber.trim() : "",
-  membershipDate: typeof body.membershipDate === "string" ? body.membershipDate.trim() : "",
+  ...normalizeMembershipForm(body),
   status: typeof body.status === "string" ? body.status : ""
 });
 
-const validateInput = (member) => {
-  const errors = {};
-  if (member.firstName.length < 1 || member.firstName.length > 60) errors.firstName = "Enter a first name between 1 and 60 characters.";
-  if (member.lastName.length < 1 || member.lastName.length > 60) errors.lastName = "Enter a last name between 1 and 60 characters.";
-  if (member.address.length < 5 || member.address.length > 1000) errors.address = "Enter a complete address between 5 and 1,000 characters.";
-  if (!/^[+\d()\s.-]{7,40}$/.test(member.contactNumber) || member.contactNumber.replace(/\D/g, "").length < 7) {
-    errors.contactNumber = "Enter a valid contact number with at least 7 digits.";
-  }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(member.membershipDate) ||
-      Number.isNaN(Date.parse(`${member.membershipDate}T00:00:00Z`)) ||
-      new Date(`${member.membershipDate}T00:00:00Z`).toISOString().slice(0, 10) !== member.membershipDate ||
-      member.membershipDate > TODAY()) {
-    errors.membershipDate = "Enter a valid membership date that is not in the future.";
-  }
-  if (!STATUSES.includes(member.status)) errors.status = "Choose Active, Inactive, or Suspended.";
+const validateInput = (member, options) => {
+  const errors = validateMembershipForm(member, options);
+  if (!STATUSES.includes(member.status)) errors.status = "Choose Active, Pending, Inactive, or Suspended.";
   return errors;
 };
 
 const presentMember = (instance) => {
   const member = instance.get({ plain: true });
-  const nameParts = [member.firstName, member.lastName].filter(Boolean);
+  const nameParts = [member.firstName, member.middleName, member.lastName, member.suffix].filter(Boolean);
   member.fullName = nameParts.join(" ") || member.fullName || "Unnamed member";
   member.contactNumber = member.contactNumber || member.contactDetails || "";
-  member.initials = nameParts.slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  member.initials = [member.firstName, member.lastName].filter(Boolean).map((part) => part[0]).join("").toUpperCase();
   member.isActive = member.status === "Active";
   member.isInactive = member.status === "Inactive";
   member.isSuspended = member.status === "Suspended";
+  member.isPending = member.status === "Pending";
   member.isArchived = Boolean(member.archivedAt);
   member.membershipDateLabel = new Intl.DateTimeFormat("en", {
     month: "short",
@@ -64,15 +62,16 @@ const presentMember = (instance) => {
 };
 
 const renderForm = (res, { member, current, isEdit, errors = {}, status = 400 }) => {
-  member.isValid = true;
   member.isActive = member.status === "Active";
   member.isInactive = member.status === "Inactive";
   member.isSuspended = member.status === "Suspended";
+  member.isPending = member.status === "Pending";
   return res.status(status).render("member-form", {
     title: isEdit ? "Edit Member Profile" : "Register Member Profile",
     current,
     currentInitials: current.name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase(),
     member,
+    application: membershipFormValues(member),
     isEdit,
     errors,
     today: TODAY()
@@ -151,10 +150,11 @@ const listRecords = async (options) => {
     offset: (options.page - 1) * options.pageSize,
     paranoid: !options.archived
   };
-  const [result, totalMembers, activeMembers, inactiveMembers, suspendedMembers, archivedMembers] = await Promise.all([
+  const [result, totalMembers, activeMembers, pendingMembers, inactiveMembers, suspendedMembers, archivedMembers] = await Promise.all([
     Member.findAndCountAll(queryOptions),
     Member.count(),
     Member.count({ where: { status: "Active" } }),
+    Member.count({ where: { status: "Pending" } }),
     Member.count({ where: { status: "Inactive" } }),
     Member.count({ where: { status: "Suspended" } }),
     Member.count({ paranoid: false, where: { archivedAt: { [Op.not]: null } } })
@@ -164,6 +164,7 @@ const listRecords = async (options) => {
     total: result.count,
     totalMembers,
     activeMembers,
+    pendingMembers,
     inactiveMembers,
     suspendedMembers,
     archivedMembers,
@@ -189,6 +190,7 @@ const renderMembersPage = async (req, res, next, archivedOnly = false) => {
       search: options.search,
       statusAll: options.status === "all",
       statusActive: options.status === "Active",
+      statusPending: options.status === "Pending",
       statusInactive: options.status === "Inactive",
       statusSuspended: options.status === "Suspended",
       showingArchived: options.archived,
@@ -293,7 +295,11 @@ export const recordMembershipPayment = async (req, res, next) => {
         receiptNumber: receiptNumber || null,
         recordedBy: current.id
       }, { transaction });
-      if (member.status !== "Active") await member.update({ status: "Active" }, { transaction });
+      if (member.status !== "Active") {
+        await member.update({ status: "Active" }, { transaction });
+        const linkedUser = await User.findOne({ where: { memberId: member.memberId }, transaction });
+        if (linkedUser) await linkedUser.update({ status: "Active" }, { transaction });
+      }
       await AuditLog.create({
         actorId: current.id,
         actorName: current.name,
@@ -371,7 +377,33 @@ export const newMemberPage = async (req, res, next) => {
     return renderForm(res, {
       current,
       isEdit: false,
-      member: { firstName: "", lastName: "", address: "Carmundo, Bongabong, Oriental Mindoro", contactNumber: "", membershipDate: TODAY(), status: "Active" },
+      member: {
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        suffix: "",
+        address: "",
+        barangay: "",
+        municipality: "",
+        province: "",
+        contactNumber: "",
+        birthDate: "",
+        placeOfBirth: "",
+        sex: "",
+        civilStatus: "",
+        spouseName: "",
+        spouseOccupation: "",
+        fatherName: "",
+        motherName: "",
+        numberOfChildren: "",
+        occupation: "",
+        employer: "",
+        memberType: "",
+        membershipDate: TODAY(),
+        signatureName: "",
+        signedAt: TODAY(),
+        status: "Active"
+      },
       status: 200
     });
   } catch (error) {
@@ -384,12 +416,42 @@ export const createMember = async (req, res, next) => {
     const current = await requireManagerPage(req, res);
     if (!current) return;
     const member = normalizeInput(req.body);
+    const username = typeof req.body.username === "string" ? req.body.username.trim().toLowerCase() : "";
+    const email = typeof req.body.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    const password = typeof req.body.password === "string" ? req.body.password : "";
     const errors = validateInput(member);
+    if (!/^[a-zA-Z0-9._-]{3,32}$/.test(username)) errors.username = "Use 3-32 letters, numbers, dots, dashes, or underscores.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) errors.email = "Enter a valid email address.";
+    if (password.length < 12 || Buffer.byteLength(password, "utf8") > 72) errors.password = "Use a password of 12-72 UTF-8 bytes.";
+    member.username = username;
+    member.email = email;
     if (Object.keys(errors).length) return renderForm(res, { member, current, isEdit: false, errors });
     let created;
     try {
       created = await sequelize.transaction(async (transaction) => {
-        const record = await Member.create(member, { transaction });
+        const duplicate = await User.findOne({
+          where: { [Op.or]: [{ username }, { email }] },
+          transaction
+        });
+        if (duplicate) {
+          const error = new Error("That username or email address is already associated with an account.");
+          error.name = "DuplicateMemberLogin";
+          throw error;
+        }
+        const formData = membershipFormValues(member);
+        const record = await Member.create(formData, { transaction });
+        await User.create({
+          name: formData.name,
+          username,
+          email,
+          password: await bcrypt.hash(password, 12),
+          role: "member",
+          memberId: record.memberId,
+          contactNumber: formData.contactNumber,
+          address: formData.address,
+          membershipDate: formData.membershipDate,
+          status: formData.status === "Active" ? "Active" : formData.status === "Pending" ? "Pending" : "Inactive"
+        }, { transaction });
         await AuditLog.create({
           actorId: current.id,
           actorName: current.name,
@@ -406,7 +468,16 @@ export const createMember = async (req, res, next) => {
           member,
           current,
           isEdit: false,
-          errors: { form: "A unique member ID could not be generated. Please submit again." },
+          errors: { form: "The username, email, or member ID is already in use. Review the account details and try again." },
+          status: 409
+        });
+      }
+      if (error.name === "DuplicateMemberLogin") {
+        return renderForm(res, {
+          member,
+          current,
+          isEdit: false,
+          errors: { form: error.message },
           status: 409
         });
       }
@@ -439,7 +510,7 @@ export const updateMember = async (req, res, next) => {
     const memberRecord = await Member.findByPk(req.params.id);
     if (!memberRecord) return res.sendStatus(404);
     const member = normalizeInput(req.body);
-    const errors = validateInput(member);
+    const errors = validateInput(member, { requireSignature: false });
     if (Object.keys(errors).length) {
       return renderForm(res, {
         member: { ...member, id: memberRecord.id, memberId: memberRecord.memberId },
@@ -448,8 +519,19 @@ export const updateMember = async (req, res, next) => {
         errors
       });
     }
+    const formData = membershipFormValues(member);
     await sequelize.transaction(async (transaction) => {
-      await memberRecord.update(member, { transaction });
+      await memberRecord.update(formData, { transaction });
+      const linkedUser = await User.findOne({ where: { memberId: memberRecord.memberId }, transaction });
+      if (linkedUser) {
+        await linkedUser.update({
+          name: formData.name,
+          contactNumber: formData.contactNumber,
+          address: formData.address,
+          membershipDate: formData.membershipDate,
+          status: formData.status === "Active" ? "Active" : formData.status === "Pending" ? "Pending" : "Inactive"
+        }, { transaction });
+      }
       await AuditLog.create({
         actorId: current.id,
         actorName: current.name,
@@ -560,24 +642,52 @@ export const createMemberApi = async (req, res, next) => {
     if (!current) return;
     const member = normalizeInput(req.body);
     const errors = validateInput(member);
+    const username = typeof req.body.username === "string" ? req.body.username.trim().toLowerCase() : "";
+    const email = typeof req.body.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    const password = typeof req.body.password === "string" ? req.body.password : "";
+    if (!/^[a-zA-Z0-9._-]{3,32}$/.test(username)) errors.username = "Enter a valid username.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) errors.email = "Enter a valid email address.";
+    if (password.length < 12 || Buffer.byteLength(password, "utf8") > 72) errors.password = "Use a password of 12-72 UTF-8 bytes.";
     if (Object.keys(errors).length) return res.status(400).json({ error: "Member details are invalid.", fields: errors });
     let created;
     try {
-      created = await Member.create(member);
+      created = await sequelize.transaction(async (transaction) => {
+        const duplicate = await User.findOne({
+          where: { [Op.or]: [{ username }, { email }] },
+          transaction
+        });
+        if (duplicate) return null;
+        const formData = membershipFormValues(member);
+        const record = await Member.create(formData, { transaction });
+        await User.create({
+          name: formData.name,
+          username,
+          email,
+          password: await bcrypt.hash(password, 12),
+          role: "member",
+          memberId: record.memberId,
+          contactNumber: formData.contactNumber,
+          address: formData.address,
+          membershipDate: formData.membershipDate,
+          status: formData.status === "Active" ? "Active" : formData.status === "Pending" ? "Pending" : "Inactive"
+        }, { transaction });
+        await AuditLog.create({
+          actorId: current.id,
+          actorName: current.name,
+          action: "created",
+          entityType: "member",
+          entityId: String(record.id),
+          details: `Created member record ${record.memberId}.`
+        }, { transaction });
+        return record;
+      });
     } catch (error) {
       if (error instanceof UniqueConstraintError) {
         return res.status(409).json({ error: "A unique member ID could not be generated. Please try again." });
       }
       throw error;
     }
-    await AuditLog.create({
-      actorId: current.id,
-      actorName: current.name,
-      action: "created",
-      entityType: "member",
-      entityId: String(created.id),
-      details: `Created member record ${created.memberId}.`
-    });
+    if (!created) return res.status(409).json({ error: "That username or email address is already associated with an account." });
     return res.status(201).json({ member: presentMember(created) });
   } catch (error) {
     next(error);
@@ -592,16 +702,29 @@ export const updateMemberApi = async (req, res, next) => {
     const memberRecord = await Member.findOne({ where: { memberId: req.params.memberId } });
     if (!memberRecord) return res.status(404).json({ error: "Member not found." });
     const member = normalizeInput({ ...memberRecord.get({ plain: true }), ...req.body });
-    const errors = validateInput(member);
+    const errors = validateInput(member, { requireSignature: false });
     if (Object.keys(errors).length) return res.status(400).json({ error: "Member details are invalid.", fields: errors });
-    await memberRecord.update(member);
-    await AuditLog.create({
-      actorId: current.id,
-      actorName: current.name,
-      action: "updated",
-      entityType: "member",
-      entityId: String(memberRecord.id),
-      details: `Updated member record ${memberRecord.memberId}.`
+    const formData = membershipFormValues(member);
+    await sequelize.transaction(async (transaction) => {
+      await memberRecord.update(formData, { transaction });
+      const linkedUser = await User.findOne({ where: { memberId: memberRecord.memberId }, transaction });
+      if (linkedUser) {
+        await linkedUser.update({
+          name: formData.name,
+          contactNumber: formData.contactNumber,
+          address: formData.address,
+          membershipDate: formData.membershipDate,
+          status: formData.status === "Active" ? "Active" : formData.status === "Pending" ? "Pending" : "Inactive"
+        }, { transaction });
+      }
+      await AuditLog.create({
+        actorId: current.id,
+        actorName: current.name,
+        action: "updated",
+        entityType: "member",
+        entityId: String(memberRecord.id),
+        details: `Updated member record ${memberRecord.memberId}.`
+      }, { transaction });
     });
     return res.json({ member: presentMember(memberRecord) });
   } catch (error) {
@@ -617,16 +740,29 @@ export const updateMemberApiById = async (req, res, next) => {
     const memberRecord = await Member.findByPk(req.params.id);
     if (!memberRecord) return res.status(404).json({ error: "Member not found." });
     const member = normalizeInput({ ...memberRecord.get({ plain: true }), ...req.body });
-    const errors = validateInput(member);
+    const errors = validateInput(member, { requireSignature: false });
     if (Object.keys(errors).length) return res.status(400).json({ error: "Member details are invalid.", fields: errors });
-    await memberRecord.update(member);
-    await AuditLog.create({
-      actorId: current.id,
-      actorName: current.name,
-      action: "updated",
-      entityType: "member",
-      entityId: String(memberRecord.id),
-      details: `Updated member record ${memberRecord.memberId}.`
+    const formData = membershipFormValues(member);
+    await sequelize.transaction(async (transaction) => {
+      await memberRecord.update(formData, { transaction });
+      const linkedUser = await User.findOne({ where: { memberId: memberRecord.memberId }, transaction });
+      if (linkedUser) {
+        await linkedUser.update({
+          name: formData.name,
+          contactNumber: formData.contactNumber,
+          address: formData.address,
+          membershipDate: formData.membershipDate,
+          status: formData.status === "Active" ? "Active" : formData.status === "Pending" ? "Pending" : "Inactive"
+        }, { transaction });
+      }
+      await AuditLog.create({
+        actorId: current.id,
+        actorName: current.name,
+        action: "updated",
+        entityType: "member",
+        entityId: String(memberRecord.id),
+        details: `Updated member record ${memberRecord.memberId}.`
+      }, { transaction });
     });
     return res.json({ member: presentMember(memberRecord) });
   } catch (error) {

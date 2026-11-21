@@ -54,7 +54,7 @@
                 <tr>
                   <td><div class="member-identity"><span class="member-avatar">{{initials}}</span><span><strong>{{firstName}} {{lastName}}</strong><small>Member profile</small></span></div></td>
                   <td class="member-id">{{memberId}}</td><td>{{membershipDate}}</td>
-                  <td><span class="status-badge {{#if isActive}}status-active{{else}}{{#if isSuspended}}status-suspended{{else}}status-inactive{{/if}}{{/if}}"><i></i>{{status}}</span></td>
+                  <td><span class="status-badge {{#if isActive}}status-active{{else}}{{#if isSuspended}}status-suspended{{else}}{{#if isPending}}status-pending{{else}}status-inactive{{/if}}{{/if}}{{/if}}"><i></i>{{status}}</span></td>
                   <td><a class="table-action" href="/members/{{id}}">View profile</a></td>
                 </tr>
                 {{else}}

@@ -5,7 +5,7 @@
     <main class="app-main">
       <header class="topbar"><span class="breadcrumb">Administration <span>/</span> Applications</span><span class="topbar-label">MEMBERSHIP REVIEW</span></header>
       <section class="page-content">
-        <div class="page-heading"><div><p class="eyebrow">MEMBERSHIP WORKFLOW</p><h1>Review applications</h1><p class="page-subtitle">Approve eligible applicants to create their member account and directory record.</p></div><span class="application-count">{{pendingCount}} awaiting review</span></div>
+        <div class="page-heading"><div><p class="eyebrow">MEMBERSHIP WORKFLOW</p><h1>Review applications</h1><p class="page-subtitle">Review applicant details and approve membership to activate the linked member account.</p></div><span class="application-count">{{pendingCount}} awaiting review</span></div>
         <section class="application-list" aria-label="Pending member applications">
           {{#each applications}}
           <article class="application-card">
@@ -13,11 +13,20 @@
             <dl class="application-details">
               <div><dt>Email</dt><dd>{{email}}</dd></div>
               <div><dt>Contact number</dt><dd>{{contactNumber}}</dd></div>
-              <div class="application-address"><dt>Address</dt><dd>{{address}}</dd></div>
+              <div class="application-address"><dt>Address</dt><dd>{{address}}{{#if barangay}}, {{barangay}}{{/if}}{{#if municipality}}, {{municipality}}{{/if}}{{#if province}}, {{province}}{{/if}}</dd></div>
+              <div><dt>Date of birth</dt><dd>{{birthDate}}</dd></div>
+              <div><dt>Place of birth</dt><dd>{{placeOfBirth}}</dd></div>
+              <div><dt>Sex / civil status</dt><dd>{{sex}} / {{civilStatus}}</dd></div>
+              <div><dt>Family</dt><dd>Father: {{fatherName}} · Mother: {{motherName}}</dd></div>
+              <div><dt>Spouse</dt><dd>{{spouseName}} {{#if spouseOccupation}}({{spouseOccupation}}){{/if}}</dd></div>
+              <div><dt>Children</dt><dd>{{numberOfChildren}}</dd></div>
+              <div><dt>Occupation / employer</dt><dd>{{occupation}} {{#if employer}}/ {{employer}}{{/if}}</dd></div>
+              <div><dt>Membership</dt><dd>{{memberType}} · {{membershipDate}}</dd></div>
+              <div><dt>Signed by</dt><dd>{{signatureName}} · {{signedAt}}</dd></div>
             </dl>
             <div class="application-actions">
               <form method="POST" action="/admin/applications/{{id}}/reject" onsubmit="return confirm('Reject this membership application?');"><button class="button button-secondary" type="submit">Reject application</button></form>
-              <form method="POST" action="/admin/applications/{{id}}/approve" onsubmit="return confirm('Approve this application and create a member account?');"><button class="button button-primary" type="submit">Approve member</button></form>
+              <form method="POST" action="/admin/applications/{{id}}/approve" onsubmit="return confirm('Approve this application and activate the linked member account?');"><button class="button button-primary" type="submit">Approve member</button></form>
             </div>
           </article>
           {{else}}

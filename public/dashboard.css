@@ -103,6 +103,8 @@ h1,h2 { font-family: Manrope, sans-serif; }
 .status-badge i { width: 6px; height: 6px; border-radius: 50%; background: #8793a5; }
 .status-active { border-color: #24513f; background: #142b25; color: #89dab8; }
 .status-active i { background: #56c29a; box-shadow: 0 0 8px #56c29a55; }
+.status-pending { border-color: #695726; background: #2a2517; color: #e3c36f; }
+.status-pending i { background: #d3ae4a; }
 .status-inactive { border-color: #4b3740; background: #291d25; color: #d6a8ad; }
 .status-inactive i { background: #c2747c; }
 .status-suspended { border-color: #694c24; background: #302514; color: #f4c36b; }
@@ -178,6 +180,20 @@ h1,h2 { font-family: Manrope, sans-serif; }
 .profile-field-wide { grid-column: 1 / -1; }
 .auth-page { display: grid; min-height: 100vh; place-items: center; padding: 28px 16px; }
 .auth-card { width: min(100%, 470px); padding: 30px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: 0 22px 70px #0003; }
+.application-auth-card { width: min(100%, 1000px); max-height: calc(100vh - 40px); overflow-y: auto; }
+.application-form-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.application-form-brand > span:last-child strong,.application-form-brand > span:last-child small { display: block; }
+.application-form-brand > span:last-child strong { color: #f7f8fb; font-size: 15px; letter-spacing: 1px; }
+.application-form-brand > span:last-child small { margin-top: 4px; color: var(--muted); font-size: 9px; }
+.application-form-title { margin-bottom: 20px; }
+.application-form-title h2 { margin: 0; color: #f7f8fb; font-size: 22px; }
+.application-form-title .page-subtitle { margin: 8px 0 0; line-height: 1.6; }
+.membership-application-form { display: grid; gap: 3px; }
+.application-auth-card .form-section-title strong { color: #edf0f5; }
+.application-auth-card .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.application-auth-card .form-field { font-size: 11px; }
+.application-auth-card .form-field input,.application-auth-card .form-field textarea,.application-auth-card .form-field select { min-height: 42px; font-size: 12px; }
+.application-auth-card .form-field textarea { min-height: 86px; }
 .auth-brand { margin-bottom: 30px; padding: 0; }
 .auth-card h1 { margin: 0; color: #f7f8fb; font-size: 27px; letter-spacing: -.8px; }
 .auth-subtitle { margin: 8px 0 22px; line-height: 1.6; }
@@ -357,9 +373,11 @@ body.app-body { background: var(--background); color: var(--text); }
 .auth-role-note,.auth-back-link { color: #77837a; }
 .form-alert { border-color: #f0d7d4; background: #fff6f5; color: #a94b43; }
 .status-active { border-color: #cfe4d2; background: #edf7ee; color: #28643d; }
+.status-pending { border-color: #f0e2ba; background: #fff9e8; color: #80641f; }
 .status-inactive { border-color: #e3e7e2; background: #f3f5f2; color: #69756c; }
 .status-suspended { border-color: #f0dec3; background: #fff7eb; color: #916221; }
 .status-active i { background: #3f9a5c; box-shadow: 0 0 8px #3f9a5c44; }
+.status-pending i { background: #c79b33; box-shadow: 0 0 8px #c79b3344; }
 .status-inactive i { background: #a1aaa2; box-shadow: none; }
 .status-suspended i { background: #d39a43; box-shadow: 0 0 8px #d39a4344; }
 
@@ -1045,6 +1063,8 @@ body.app-body > footer { display: none; }
   .modal-form { grid-template-columns: 1fr; gap: 13px; }
   .modal-form .form-field:nth-of-type(4),.modal-actions,.modal-error { grid-column: 1; }
   .form-card { padding: 19px; }
+  .application-auth-card { padding: 20px; }
+  .application-auth-card .form-grid { grid-template-columns: 1fr; }
   .member-id-callout { margin: -19px -19px 21px; padding: 13px 19px; }
   .form-grid,.profile-grid { grid-template-columns: 1fr; }
   .form-field-wide,.profile-field-wide { grid-column: auto; }

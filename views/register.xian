@@ -2,17 +2,16 @@
 <body class="app-body auth-page">
   <div class="auth-card">
     <a class="brand auth-brand" href="/"><span class="brand-mark">K</span><span>KAMBAC<span class="brand-accent">.</span></span></a>
-    <p class="eyebrow">MEMBER REGISTRATION</p>
+    <p class="eyebrow">MEMBER ACCOUNT</p>
     <h1>Create your account</h1>
-    <p class="page-subtitle auth-subtitle">Submit your membership application. You can sign in once an administrator approves it.</p>
+    <p class="page-subtitle auth-subtitle">Create your secure login first. You will complete the membership application form next.</p>
+    {{#if errorMessage}}<p class="form-alert" role="alert">{{errorMessage}}</p>{{/if}}
     <form class="auth-form" method="POST" action="/register">
-      <label class="form-field"><span>Full name <b>*</b></span><input type="text" name="name" minlength="2" maxlength="120" autocomplete="name" required></label>
-      <label class="form-field"><span>Username <b>*</b></span><input type="text" name="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9._-]{3,32}" autocomplete="username" required><small class="field-hint">Use 3–32 letters, numbers, dots, dashes, or underscores.</small></label>
-      <label class="form-field"><span>Email address <b>*</b></span><input type="email" name="email" maxlength="254" autocomplete="email" required></label>
-      <label class="form-field"><span>Contact number <b>*</b></span><input type="tel" name="contactNumber" minlength="7" maxlength="40" autocomplete="tel" placeholder="+63 9XX XXX XXXX" required></label>
-      <label class="form-field"><span>Home address <b>*</b></span><textarea name="address" rows="3" minlength="5" maxlength="500" autocomplete="street-address" required></textarea></label>
-      <label class="form-field"><span>Password <b>*</b></span><input type="password" name="password" minlength="8" maxlength="72" autocomplete="new-password" required></label>
-      <button class="button button-primary auth-submit" type="submit">Submit application</button>
+      <label class="form-field"><span>Full name <b>*</b></span><input type="text" name="name" value="{{form.name}}" minlength="2" maxlength="120" autocomplete="name" required></label>
+      <label class="form-field"><span>Username <b>*</b></span><input type="text" name="username" value="{{form.username}}" minlength="3" maxlength="32" pattern="[A-Za-z0-9._-]{3,32}" autocomplete="username" required><small class="field-hint">Use 3–32 letters, numbers, dots, dashes, or underscores.</small></label>
+      <label class="form-field"><span>Email address <b>*</b></span><input type="email" name="email" value="{{form.email}}" maxlength="254" autocomplete="email" required></label>
+      <label class="form-field"><span>Password <b>*</b></span><input type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password" required><small class="field-hint">Use at least 12 characters.</small></label>
+      <button class="button button-primary auth-submit" type="submit">Create account and continue</button>
       <a class="auth-login-link" href="/login">Already have an account? Log in</a>
     </form>
   </div>

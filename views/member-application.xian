@@ -1,0 +1,22 @@
+{{> head}}
+<body class="app-body auth-page">
+  <main class="auth-page-content">
+    <section class="auth-card application-auth-card">
+      {{#if applicationSubmitted}}
+      <div class="application-form-brand"><span class="brand-mark">K</span><span><strong>KAMBAC</strong><small>Integrated Management System</small></span></div>
+      <p class="eyebrow">APPLICATION RECEIVED</p>
+      <h1>Your membership application is {{applicationStatus}}.</h1>
+      <p class="page-subtitle">Your account is pending administrator review. Sign in again to check this page after review.</p>
+      <a class="button button-secondary" href="/logout">Sign out</a>
+      {{else}}
+      <div class="application-form-brand"><span class="brand-mark">K</span><span><strong>KAMBAC</strong><small>Integrated Management System</small></span></div>
+      <p class="page-subtitle">Account email: <strong>{{accountEmail}}</strong></p>
+      {{#if errors.form}}<p class="form-alert" role="alert">{{errors.form}}</p>{{/if}}
+      <form method="POST" action="/member/application" class="membership-application-form">
+        {{> membership-form-fields}}
+        <div class="form-actions"><a class="button button-secondary" href="/logout">Sign out</a><button class="button button-primary" type="submit">Submit membership application</button></div>
+      </form>
+      {{/if}}
+    </section>
+  </main>
+{{> footer }}

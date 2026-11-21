@@ -8,13 +8,14 @@
       <section class="page-content">
         <div class="page-heading">
           <div><p class="eyebrow">{{#if showingArchived}}RECORD HISTORY{{else}}CENTRAL REPOSITORY{{/if}}</p><h1>{{#if showingArchived}}Archived members{{else}}Member Management{{/if}}</h1><p class="page-subtitle">{{#if showingArchived}}Historical member records retained for reference.{{else}}Maintain member profiles, status, and organizational records.{{/if}}</p></div>
-          {{#unless showingArchived}}<div class="page-actions"><a class="button action-button" href="/members/renewals">Renewal tracking</a><a class="button action-button" href="/admin/applications">Applications</a><a class="button action-button" href="/members/export.csv">Export Excel CSV</a><a class="button action-button" href="/members/export.pdf" target="_blank" rel="noopener">Export PDF</a><button class="button button-primary" type="button" data-open-member-modal><span aria-hidden="true">＋</span> Register member</button></div>{{/unless}}
+          {{#unless showingArchived}}<div class="page-actions"><a class="button action-button" href="/members/renewals">Renewal tracking</a><a class="button action-button" href="/admin/applications">Applications</a><a class="button action-button" href="/members/export.csv">Export Excel CSV</a><a class="button action-button" href="/members/export.pdf" target="_blank" rel="noopener">Export PDF</a><a class="button button-primary" href="/members/new"><span aria-hidden="true">＋</span> Register member</a></div>{{/unless}}
         </div>
 
         {{#unless showingArchived}}
         <section class="stats-grid" aria-label="Membership statistics">
           <article class="stat-card"><div class="stat-top"><span>Total members</span><span class="stat-icon">♙</span></div><strong>{{totalMembers}}</strong><small>Current records</small></article>
           <article class="stat-card"><div class="stat-top"><span>Active</span><span class="stat-icon">✓</span></div><strong>{{activeMembers}}</strong><small>Active memberships</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Pending</span><span class="stat-icon">◷</span></div><strong>{{pendingMembers}}</strong><small>Pending memberships</small></article>
           <article class="stat-card"><div class="stat-top"><span>Inactive</span><span class="stat-icon">◌</span></div><strong>{{inactiveMembers}}</strong><small>Inactive memberships</small></article>
           <article class="stat-card"><div class="stat-top"><span>Suspended</span><span class="stat-icon">!</span></div><strong>{{suspendedMembers}}</strong><small>Suspended memberships</small></article>
         </section>
@@ -25,7 +26,7 @@
             <div><h2>{{#if showingArchived}}Archived records{{else}}Organization members{{/if}}</h2><p class="muted-copy">Search by member ID, name, address, or contact details.</p></div>
             <form class="directory-filters" id="member-filters" method="GET" action="{{#if showingArchived}}/members/archive{{else}}/members{{/if}}">
               <label class="search-box"><span aria-hidden="true">⌕</span><input id="member-search" type="search" name="search" value="{{search}}" maxlength="100" placeholder="Search name or Member ID..." aria-label="Search members"></label>
-              <label class="filter-select-label"><span class="sr-only">Filter by status</span><select id="member-status-filter" name="status" class="filter-select"><option value="all" {{#if statusAll}}selected{{/if}}>All statuses</option><option value="Active" {{#if statusActive}}selected{{/if}}>Active</option><option value="Inactive" {{#if statusInactive}}selected{{/if}}>Inactive</option><option value="Suspended" {{#if statusSuspended}}selected{{/if}}>Suspended</option></select></label>
+              <label class="filter-select-label"><span class="sr-only">Filter by status</span><select id="member-status-filter" name="status" class="filter-select"><option value="all" {{#if statusAll}}selected{{/if}}>All statuses</option><option value="Active" {{#if statusActive}}selected{{/if}}>Active</option><option value="Pending" {{#if statusPending}}selected{{/if}}>Pending</option><option value="Inactive" {{#if statusInactive}}selected{{/if}}>Inactive</option><option value="Suspended" {{#if statusSuspended}}selected{{/if}}>Suspended</option></select></label>
               <label class="filter-select-label"><span class="sr-only">Rows per page</span><select name="pageSize" class="filter-select"><option value="10" {{#if pageSize10}}selected{{/if}}>10 per page</option><option value="25" {{#if pageSize25}}selected{{/if}}>25 per page</option><option value="50" {{#if pageSize50}}selected{{/if}}>50 per page</option></select></label>
               <button class="button button-secondary" type="submit">Apply</button>
             </form>
@@ -41,7 +42,7 @@
                   <td>{{contactNumber}}</td>
                   <td class="member-address" title="{{address}}">{{address}}</td>
                   <td class="joined-date">{{membershipDate}}</td>
-                  <td><span class="status-badge {{#if isActive}}status-active{{else}}{{#if isSuspended}}status-suspended{{else}}status-inactive{{/if}}{{/if}}"><i></i>{{status}}</span></td>
+                  <td><span class="status-badge {{#if isActive}}status-active{{else}}{{#if isSuspended}}status-suspended{{else}}{{#if isPending}}status-pending{{else}}status-inactive{{/if}}{{/if}}{{/if}}"><i></i>{{status}}</span></td>
                   <td class="row-actions">
                     <a class="table-action" href="/members/{{id}}">View</a>
                     {{#if ../showingArchived}}
@@ -82,7 +83,7 @@
         <label class="form-field"><span>Contact number <b>*</b></span><input id="member-contact" name="contactNumber" type="tel" minlength="7" maxlength="40" placeholder="+63 9XX XXX XXXX" required></label>
         <label class="form-field"><span>Complete address <b>*</b></span><textarea id="member-address" name="address" rows="2" minlength="5" maxlength="1000" required>Carmundo, Bongabong, Oriental Mindoro</textarea></label>
         <label class="form-field"><span>Membership date <b>*</b></span><input id="member-date" name="membershipDate" type="date" max="{{today}}" required></label>
-        <label class="form-field"><span>Status <b>*</b></span><select id="member-status" name="status" required><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Suspended">Suspended</option></select></label>
+        <label class="form-field"><span>Status <b>*</b></span><select id="member-status" name="status" required><option value="Active">Active</option><option value="Pending">Pending</option><option value="Inactive">Inactive</option><option value="Suspended">Suspended</option></select></label>
         <div class="modal-actions"><button class="button button-secondary" type="button" data-close-member-modal>Cancel</button><button class="button button-primary" id="member-modal-submit" type="submit">Create member</button></div>
       </form>
     </section>
@@ -107,7 +108,7 @@
         const date = new Date(`${value}T00:00:00Z`);
         return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(date);
       };
-      const statusClass = (status) => status === "Active" ? "status-active" : status === "Suspended" ? "status-suspended" : "status-inactive";
+      const statusClass = (status) => status === "Active" ? "status-active" : status === "Pending" ? "status-pending" : status === "Suspended" ? "status-suspended" : "status-inactive";
       const createCell = (text, className = "") => {
         const cell = document.createElement("td");
         cell.textContent = text || "—";
@@ -223,7 +224,6 @@
         modal.hidden = true;
         document.body.classList.remove("modal-open");
       };
-      document.querySelector("[data-open-member-modal]").addEventListener("click", () => openModal());
       modal.querySelectorAll("[data-close-member-modal]").forEach((button) => button.addEventListener("click", closeModal));
       modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
       document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !modal.hidden) closeModal(); });

@@ -5,23 +5,24 @@
     <main class="app-main">
       <header class="topbar"><span class="breadcrumb"><a href="/members">Members</a><span>/</span>{{#if isEdit}}Edit profile{{else}}Register profile{{/if}}</span><span class="topbar-label">MEMBER RECORDS</span></header>
       <section class="page-content form-page">
-        <div class="page-heading"><div><p class="eyebrow">MEMBER PROFILE</p><h1>{{#if isEdit}}Update member record{{else}}Register a member{{/if}}</h1><p class="page-subtitle">Maintain accurate personal and membership information.</p></div></div>
+        <div class="page-heading"><div><p class="eyebrow">MEMBER PROFILE</p><h1>{{#if isEdit}}Update member record{{else}}Register a member{{/if}}</h1><p class="page-subtitle">Complete the membership form and member portal account details.</p></div></div>
         {{#if errors.form}}<p class="form-alert" role="alert">{{errors.form}}</p>{{/if}}
         <form class="form-card" method="POST" action="{{#if isEdit}}/members/{{member.id}}{{else}}/members{{/if}}">
-          {{#if isEdit}}<div class="member-id-callout"><span><small>MEMBER ID</small><strong>{{member.memberId}}</strong></span><span class="status-badge {{#if member.isActive}}status-active{{else}}{{#if member.isSuspended}}status-suspended{{else}}status-inactive{{/if}}{{/if}}"><i></i>{{member.status}}</span></div>{{/if}}
-          <div class="form-section-title"><span class="form-section-icon">01</span><span><strong>Personal information</strong><small>Member identity and contact information</small></span></div>
+          {{#if isEdit}}<div class="member-id-callout"><span><small>MEMBER ID</small><strong>{{member.memberId}}</strong></span></div>{{/if}}
+          {{#unless isEdit}}
+          <div class="form-section-title"><span class="form-section-icon">00</span><span><strong>Member Portal Account</strong><small>Set the login credentials for this member</small></span></div>
           <div class="form-grid">
-            <label class="form-field"><span>First name <b>*</b></span><input name="firstName" type="text" value="{{member.firstName}}" minlength="1" maxlength="60" autocomplete="given-name" required>{{#if errors.firstName}}<small class="field-error">{{errors.firstName}}</small>{{/if}}</label>
-            <label class="form-field"><span>Last name <b>*</b></span><input name="lastName" type="text" value="{{member.lastName}}" minlength="1" maxlength="60" autocomplete="family-name" required>{{#if errors.lastName}}<small class="field-error">{{errors.lastName}}</small>{{/if}}</label>
-            <label class="form-field form-field-wide"><span>Contact number <b>*</b></span><input name="contactNumber" type="tel" value="{{member.contactNumber}}" minlength="7" maxlength="40" autocomplete="tel" placeholder="+63 9XX XXX XXXX" required>{{#if errors.contactNumber}}<small class="field-error">{{errors.contactNumber}}</small>{{/if}}</label>
-            <label class="form-field form-field-wide"><span>Complete address <b>*</b></span><textarea name="address" rows="3" minlength="5" maxlength="1000" autocomplete="street-address" required>{{member.address}}</textarea>{{#if errors.address}}<small class="field-error">{{errors.address}}</small>{{/if}}</label>
+            <label class="form-field"><span>Username <b>*</b></span><input name="username" value="{{member.username}}" minlength="3" maxlength="32" pattern="[A-Za-z0-9._-]{3,32}" autocomplete="username" required>{{#if errors.username}}<small class="field-error">{{errors.username}}</small>{{/if}}</label>
+            <label class="form-field"><span>Email address <b>*</b></span><input name="email" type="email" value="{{member.email}}" maxlength="254" autocomplete="email" required>{{#if errors.email}}<small class="field-error">{{errors.email}}</small>{{/if}}</label>
+            <label class="form-field form-field-wide"><span>Initial password <b>*</b></span><input name="password" type="password" minlength="12" maxlength="72" autocomplete="new-password" required><small class="field-hint">Use a unique password with at least 12 characters and share it securely with the member.</small>{{#if errors.password}}<small class="field-error">{{errors.password}}</small>{{/if}}</label>
           </div>
-          <div class="form-section-title form-section-spaced"><span class="form-section-icon">02</span><span><strong>Membership details</strong><small>Membership date and current standing</small></span></div>
+          {{/unless}}
+          {{> membership-form-fields}}
+          <div class="form-section-title form-section-spaced"><span class="form-section-icon">07</span><span><strong>Membership status</strong><small>{{#if isEdit}}Update the member's current standing{{else}}Choose whether the new membership is pending or active{{/if}}</small></span></div>
           <div class="form-grid">
-            <label class="form-field"><span>Membership date <b>*</b></span><input name="membershipDate" type="date" value="{{member.membershipDate}}" max="{{today}}" required>{{#if errors.membershipDate}}<small class="field-error">{{errors.membershipDate}}</small>{{/if}}</label>
-            <label class="form-field"><span>Membership status <b>*</b></span><select name="status" required><option value="Active" {{#if member.isActive}}selected{{/if}}>Active</option><option value="Inactive" {{#if member.isInactive}}selected{{/if}}>Inactive</option><option value="Suspended" {{#if member.isSuspended}}selected{{/if}}>Suspended</option></select>{{#if errors.status}}<small class="field-error">{{errors.status}}</small>{{/if}}</label>
+            <label class="form-field"><span>{{#if isEdit}}Membership status{{else}}Initial status{{/if}} <b>*</b></span><select name="status" required><option value="Active" {{#if member.isActive}}selected{{/if}}>Active</option><option value="Pending" {{#if member.isPending}}selected{{/if}}>Pending</option><option value="Inactive" {{#if member.isInactive}}selected{{/if}}>Inactive</option><option value="Suspended" {{#if member.isSuspended}}selected{{/if}}>Suspended</option></select>{{#if errors.status}}<small class="field-error">{{errors.status}}</small>{{/if}}</label>
           </div>
-          <div class="form-actions"><a class="button button-secondary" href="{{#if isEdit}}/members/{{member.id}}{{else}}/members{{/if}}">Cancel</a><button class="button button-primary" type="submit">{{#if isEdit}}Save changes{{else}}Create member record{{/if}}</button></div>
+          <div class="form-actions"><a class="button button-secondary" href="{{#if isEdit}}/members/{{member.id}}{{else}}/members{{/if}}">Cancel</a><button class="button button-primary" type="submit">{{#if isEdit}}Save changes{{else}}Create member and account{{/if}}</button></div>
         </form>
       </section>
     </main>
