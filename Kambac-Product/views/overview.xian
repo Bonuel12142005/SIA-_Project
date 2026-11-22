@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>{{title}} | KAMBAC</title>
+  <link rel="stylesheet" href="/tailwind.css">
+  <style>
+    :root { color-scheme: dark; }
+    body { background: #080b10; color: #f5f7fb; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    .panel { background: #111722; border: 1px solid #202938; border-radius: 12px; box-shadow: 0 12px 30px #00000020; }
+    aside { background: #0d1218; border-color: #202630; color: #fff; }
+    .active { background: #2a2413; color: #f5b400; }
+    aside nav a:hover { background: #1d222b; color: #f5b400; }
+    header { background: #0d1218; border-color: #202630; }
+    .badge { border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700; }
+    .available, .low_stock, .out_of_stock { background: #123b2d; color: #7ee2b5; }
+    .overview-error { border-color: #3b252b; background: #24151a; color: #ff9ca6; }
+    .overview-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: #2a2413; color: #f5b400; }
+    .nav-section { margin: 0 0 8px; color: #687382; font-size: 10px; font-weight: 700; letter-spacing: .16em; }
+    .nav-item { display: flex; align-items: center; gap: 11px; }
+    .nav-icon { width: 16px; height: 16px; color: currentColor; }
+    .sidebar-footer { margin-top: auto; border-top: 1px solid #202630; padding-top: 18px; }
+    .text-green-700, .text-green-800 { color: #f5b400 !important; }
+    .text-slate-500 { color: #8d98a8 !important; }
+    .text-slate-400 { color: #aab3c0 !important; }
+    .divide-green-100 > :not([hidden]) ~ :not([hidden]) { border-color: #202938; }
+    .hover\:bg-green-50:hover { background: #161e2b; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="flex min-h-screen">
+    <aside class="hidden w-64 shrink-0 border-r p-5 md:block">
+      <div class="mb-10 flex items-center gap-3"><div class="grid h-10 w-10 place-items-center rounded-xl bg-white font-black text-green-800">K</div><div><div class="font-bold tracking-wide">KAMBAC</div><div class="text-xs text-green-100">Integrated Management</div></div></div>
+      <nav class="space-y-2 text-sm">
+        <p class="nav-section">WORKSPACE</p>
+        <a href="/overview" class="nav-item active block rounded-lg px-4 py-3 font-semibold"><span class="nav-icon">▦</span>Overview</a>
+        <a href="/products" class="nav-item block rounded-lg px-4 py-3 font-semibold text-green-100 hover:bg-green-700 hover:text-white"><span class="nav-icon">▣</span>Products</a>
+        <p class="nav-section mt-8">PERSONAL</p>
+        <a href="/account" class="nav-item block rounded-lg px-4 py-3 font-semibold text-green-100 hover:bg-green-700 hover:text-white"><span class="nav-icon">♙</span>My account</a>
+      </nav>
+      <div class="sidebar-footer"><a href="/logout" class="nav-item block text-sm text-green-100 hover:text-white"><span class="nav-icon">↪</span>Log out</a></div>
+    </aside>
+    <main class="min-w-0 flex-1">
+      <header class="flex items-center justify-between border-b border-[#dce8df] bg-white px-5 py-4 sm:px-8">
+        <div><p class="text-xs uppercase tracking-[.2em] text-green-700">Dashboard</p><h1 class="text-xl font-bold sm:text-2xl">Overview</h1></div>
+        <a href="/account" class="text-sm font-semibold text-green-800 hover:text-green-600">{{user.name}}</a>
+      </header>
+      <div class="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
+        {{#if pageError}}<div class="overview-error rounded-xl border px-4 py-3 text-sm">{{pageError}}</div>{{/if}}
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="panel p-5"><div class="mb-5 flex items-center justify-between"><span class="text-sm text-slate-500">Total Products</span><span class="overview-icon">▦</span></div><p class="text-3xl font-bold">{{summary.total}}</p><p class="mt-2 text-xs text-slate-500">All product records</p></article>
+          <article class="panel p-5"><div class="mb-5 flex items-center justify-between"><span class="text-sm text-slate-500">Available Products</span><span class="overview-icon">✓</span></div><p class="text-3xl font-bold text-green-700">{{summary.available}}</p><p class="mt-2 text-xs text-slate-500">More than 10 units in stock</p></article>
+          <article class="panel p-5"><div class="mb-5 flex items-center justify-between"><span class="text-sm text-slate-500">Low-Stock Products</span><span class="overview-icon">!</span></div><p class="mt-3 text-3xl font-bold text-green-700">{{summary.lowStock}}</p><p class="mt-2 text-xs text-slate-500">1 to 10 units in stock</p></article>
+          <article class="panel p-5"><div class="mb-5 flex items-center justify-between"><span class="text-sm text-slate-500">Out-of-Stock Products</span><span class="overview-icon">0</span></div><p class="mt-3 text-3xl font-bold text-green-700">{{summary.outOfStock}}</p><p class="mt-2 text-xs text-slate-500">No units currently available</p></article>
+        </section>
+        <section class="panel overflow-hidden">
+          <div class="flex items-center justify-between border-b border-[#dce8df] p-5"><div><h2 class="text-lg font-bold">Recently updated products</h2><p class="mt-1 text-sm text-slate-500">Keep track of the latest inventory changes.</p></div><a href="/products" class="text-sm font-semibold text-green-700 hover:text-green-600">View all</a></div>
+          {{#if recentProducts.length}}
+          <div class="divide-y divide-green-100">{{#each recentProducts}}<a href="/products/{{id}}" class="flex items-center justify-between gap-4 px-5 py-4 hover:bg-green-50"><div><p class="font-semibold">{{productName}}</p><p class="text-xs text-slate-500">{{productCode}} · {{category}}</p></div><div class="text-right"><p class="font-semibold">{{quantity}} {{unit}}</p><span class="badge {{stockStatus}}">{{stockLabel}}</span></div></a>{{/each}}</div>
+          {{else}}<div class="p-10 text-center text-sm text-slate-500">No products available yet. <a class="font-semibold text-green-700" href="/products">Add a product</a></div>{{/if}}
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>{{title}} | KAMBAC</title>
+  <link rel="stylesheet" href="/tailwind.css">
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; background: #f3f7f4; color: #173524; font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif; }
+    button, input, select, textarea { font-family: inherit; }
+    .topbar { background: #087a55; box-shadow: 0 1px 0 rgba(4, 74, 49, .35); }
+    .topnav a { color: #d9eee4; }
+    .topnav a.active { color: #fff; }
+    .panel { background: #fff; border: 1px solid #dde8e1; border-radius: 8px; box-shadow: 0 3px 12px rgba(28, 79, 52, .055); }
+    .summary-card { min-height: 128px; border: 1px solid #dce7df; border-top: 4px solid #087a55; }
+    .summary-icon { background: #ecf8f2; border: 1px solid #bfe1cf; color: #087a55; }
+    .field { background: #fff; border: 1px solid #ccdacf; color: #173524; border-radius: 8px; transition: border-color .15s, box-shadow .15s; }
+    .field:focus { outline: none; border-color: #087a55; box-shadow: 0 0 0 3px rgba(8, 122, 85, .12); }
+    .form-card { background: #fff; border: 1px solid #dde8e1; border-radius: 8px; }
+    .form-card-header { border-bottom: 1px solid #e3ebe6; }
+    .gold-button { background: #087a55; color: #fff; }
+    .gold-button:hover { background: #066b4a; }
+    .badge { border-radius: 999px; padding: 4px 9px; font-size: 10px; font-weight: 800; }
+    .available, .in-stock { background: #e4f6ec; color: #087a55; }
+    .low_stock { background: #fff3cd; color: #916400; }
+    .out_of_stock { background: #fee2e2; color: #b91c1c; }
+    .product-card { border: 1px solid #dbe6df; border-top: 4px solid #087a55; border-radius: 8px; box-shadow: 0 2px 8px rgba(28, 79, 52, .07); transition: transform .18s, border-color .18s, box-shadow .18s; }
+    .product-card:hover { transform: translateY(-3px); border-color: #72bd9a; box-shadow: 0 10px 22px rgba(28, 79, 52, .12); }
+    .product-card img { background: #eef3ef; }
+    .view-button { background: #087a55; color: #fff; }
+    .view-button:hover { background: #066746; }
+    .section-shell { border: 1px solid #dbe6df; border-radius: 8px; overflow: hidden; background: #fff; }
+    .text-slate-400, .text-slate-500 { color: #7a8b80 !important; }
+    body.dark-mode { background: #101713; color: #edf7f1; }
+    body.dark-mode .panel, body.dark-mode .section-shell, body.dark-mode .field, body.dark-mode .form-card { background: #17211b; border-color: #314439; color: #edf7f1; }
+    body.dark-mode .summary-card { background: #17211b; }
+    body.dark-mode .text-slate-400, body.dark-mode .text-slate-500 { color: #9aaca1 !important; }
+    body.dark-mode .product-card { border-color: #314439; background: #17211b; }
+    .text-green-700, .text-green-800 { color: #087a55 !important; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <nav class="topbar">
+    <div class="mx-auto flex h-16 max-w-[1600px] items-center gap-8 px-5">
+      <a href="/products" class="flex items-center gap-3"><span class="grid h-10 w-10 place-items-center rounded-lg bg-white text-lg font-black text-[#087a55]">K</span><span class="font-bold tracking-wide text-white">KAMBAC</span></a>
+      <div class="topnav hidden items-center gap-8 text-sm font-semibold md:flex">
+        <a href="/products" class="active">Products</a>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <button id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle theme" class="grid h-10 w-10 place-items-center rounded-lg border border-white/15 bg-white/10 text-lg text-white transition hover:bg-white/15"><span id="themeIcon">☀</span></button>
+      </div>
+      <div class="relative">
+        <button id="profileMenuBtn" type="button" aria-expanded="false" aria-controls="profileMenu" class="flex items-center gap-3 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-left text-white transition hover:bg-white/15">
+          <span class="grid h-9 w-9 place-items-center rounded-full bg-white font-bold text-[#087a55]">{{userInitial}}</span>
+          <div class="hidden min-w-28 text-left sm:block"><p class="text-sm font-semibold leading-tight">{{user.name}}</p><p class="mt-0.5 text-xs capitalize text-emerald-100">{{user.role}}</p></div>
+          <span class="text-xs text-emerald-100">⌄</span>
+        </button>
+        <div id="profileMenu" class="absolute right-0 top-[calc(100%+10px)] z-50 hidden w-72 overflow-hidden rounded-lg border border-[#dce8df] bg-white shadow-xl">
+          <div class="border-b border-[#e5ede8] p-4">
+            <div class="flex items-center gap-3"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#087a55] font-bold text-white">{{userInitial}}</span><div class="min-w-0"><p class="truncate font-bold text-[#173524]">{{user.name}}</p><p class="mt-0.5 text-xs capitalize text-[#087a55]">{{user.role}}</p></div></div>
+          </div>
+          <dl class="space-y-3 p-4 text-sm"><div><dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Email</dt><dd class="mt-0.5 break-all text-[#173524]">{{user.email}}</dd></div>{{#if user.username}}<div><dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Username</dt><dd class="mt-0.5 text-[#173524]">{{user.username}}</dd></div>{{/if}}{{#if user.contactNumber}}<div><dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Contact</dt><dd class="mt-0.5 text-[#173524]">{{user.contactNumber}}</dd></div>{{/if}}</dl>
+          <div class="border-t border-[#e5ede8] p-2"><a href="/logout" class="flex items-center justify-center rounded-md px-3 py-2 text-sm font-bold text-[#b42318] transition hover:bg-red-50">Log out</a></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main class="min-h-[calc(100vh-4rem)]">
+      <div class="mx-auto max-w-[1500px] space-y-6 p-5 sm:p-8">
+        {{#if success_msg}}<div class="rounded-xl border border-emerald-800 bg-emerald-950/60 px-4 py-3 text-sm text-emerald-300">{{#each success_msg}}{{this}}{{/each}}</div>{{/if}}
+        {{#if error_msg}}<div class="rounded-xl border border-rose-800 bg-rose-950/60 px-4 py-3 text-sm text-rose-300">{{#each error_msg}}{{this}}{{/each}}</div>{{/if}}
+        {{#if pageError}}<div class="rounded-xl border border-rose-800 bg-rose-950/60 px-4 py-3 text-sm text-rose-300">{{pageError}}</div>{{/if}}
+
+        {{#unless showForm}}
+        <button id="addProductBtn" type="button" class="hidden"></button>
+        <section class="grid gap-4 sm:grid-cols-2">
+          <div class="panel summary-card flex items-center justify-between p-6"><div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Products</p><p class="mt-3 text-4xl font-black text-[#173524]">{{summary.total}}</p></div><span class="summary-icon grid h-14 w-14 place-items-center rounded-xl text-2xl">▣</span></div>
+          <div class="panel summary-card flex items-center justify-between p-6"><div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Value</p><p class="mt-3 text-4xl font-black text-[#173524]">₱{{summary.totalValue}}</p></div><span class="summary-icon grid h-14 w-14 place-items-center rounded-xl text-2xl">₱</span></div>
+        </section>
+        <div class="panel flex flex-col gap-3 p-4 sm:flex-row"><div class="relative flex-1"><span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">⌕</span><input id="searchInput" type="search" class="field w-full py-3 pl-11 pr-4" placeholder="Search products..."></div><select id="categoryFilter" class="field px-4 py-3 sm:min-w-48"><option value="">All Categories</option>{{#each categories}}<option value="{{name}}">{{name}}</option>{{/each}}</select></div>
+        <section class="section-shell">
+          <div class="flex items-center justify-between bg-[#087a55] px-6 py-4"><h2 class="font-bold text-white">Active Products</h2><button type="button" onclick="document.getElementById('addProductBtn').click()" class="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-[#087a55] shadow-sm transition hover:bg-emerald-50">＋ <span>Add Product</span></button></div>
+          <div id="productsGrid" class="grid gap-5 p-5 sm:grid-cols-2 xl:grid-cols-4">
+          {{#if products.length}}
+          {{#each products}}
+          <article class="panel product-card flex flex-col overflow-hidden p-0" data-name="{{productName}}" data-code="{{productCode}}" data-category="{{category}}">
+            {{#if imagePath}}<img src="{{imagePath}}" alt="{{productName}}" class="h-40 w-full object-cover">{{else}}<div class="grid h-40 place-items-center bg-[#eef4f0] text-4xl text-[#a8bcae]">▣</div>{{/if}}
+            <div class="flex flex-1 flex-col p-5"><div class="flex items-start justify-between gap-3"><div><p class="text-xs uppercase tracking-wider text-slate-500">{{productCode}}</p><h3 class="mt-2 text-lg font-bold">{{productName}}</h3><p class="mt-1 text-sm text-slate-400">{{category}}</p></div><span class="badge {{stockStatus}} capitalize">{{stockLabel}}</span></div>
+            <p class="mt-5 min-h-12 text-sm text-slate-400">{{#if description}}{{description}}{{else}}No description provided.{{/if}}</p>
+            <div class="mt-5 grid grid-cols-2 gap-3 border-t border-[#203452] pt-4"><div><p class="text-xs text-slate-500">Quantity</p><p class="mt-1 font-semibold">{{quantity}} {{unit}}</p></div><div><p class="text-xs text-slate-500">Price</p><p class="mt-1 font-semibold">₱{{price}}</p></div></div>
+            <button type="button" data-product-id="{{id}}" class="view-product view-button mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-bold">View Details <span>→</span></button></div>
+          </article>
+          {{/each}}
+          {{else}}
+          <div class="panel p-10 text-center sm:col-span-2 xl:col-span-3"><p class="font-semibold">No products available yet.</p><p class="mt-2 text-sm text-slate-400">Add your first product to start managing inventory.</p><a href="/products/new#product-form" class="gold-button mt-5 inline-flex rounded-lg px-5 py-2.5 text-sm font-bold">＋ Add product</a></div>
+          {{/if}}
+          </div>
+        </section>
+        {{/unless}}
+        {{#if showForm}}
+        <div class="mb-2"><a href="/products" class="text-xs text-green-700 hover:text-green-600">&larr; Back to products</a><p class="mt-6 text-xs uppercase tracking-[.2em] text-green-700">Product management</p><h2 class="mt-2 text-3xl font-bold">{{#if isEdit}}Edit product{{else}}Add product{{/if}}</h2><p class="mt-1 text-sm text-slate-400">Add clear and accurate information about your product.</p></div>
+        <form id="product-form" method="POST" enctype="multipart/form-data" action="{{#if isEdit}}/products/{{formProduct.id}}/update{{else}}/products{{/if}}">
+          <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(260px,.85fr)]">
+            <section class="form-card p-5 sm:p-6">
+              <div class="form-card-header mb-6 flex items-start gap-3 pb-5"><span class="section-icon">&#9998;</span><div><h3 class="font-bold">Product details</h3><p class="mt-1 text-xs text-slate-400">Enter the basic information for this product.</p></div></div>
+              <div class="space-y-6">
+                <label class="block text-sm font-semibold">Product name <span class="text-green-700">*</span><input class="field mt-2 w-full px-3 py-3" name="productName" value="{{formProduct.productName}}" maxlength="150" placeholder="Enter the product name" required><span class="form-hint mt-1 block">Use a clear and descriptive name.</span></label>
+                <input type="hidden" name="productCode" value="{{formProduct.productCode}}">
+                <input type="hidden" name="category" value="{{formProduct.category}}">
+                <label class="block text-sm font-semibold">Description<textarea class="field mt-2 min-h-40 w-full px-3 py-3" name="description" maxlength="1000" placeholder="Describe the product and its use...">{{formProduct.description}}</textarea><span class="form-hint mt-1 block">A short description helps members understand the product.</span></label>
+              </div>
+            </section>
+            <div class="space-y-5">
+              <section class="form-card p-5 sm:p-6">
+                <div class="form-card-header mb-5 pb-5"><h3 class="font-bold">Inventory</h3><p class="mt-1 text-xs text-slate-400">Set the available quantity and price.</p></div>
+                <div class="space-y-5">
+                  <label class="block text-sm font-semibold">Quantity <span class="text-green-700">*</span><input class="field mt-2 w-full px-3 py-3" type="number" name="quantity" min="0" step="1" value="{{formProduct.quantity}}" placeholder="0" required></label>
+                  <label class="block text-sm font-semibold">Unit <span class="text-green-700">*</span><input class="field mt-2 w-full px-3 py-3" name="unit" value="{{formProduct.unit}}" placeholder="e.g. sack, piece" required></label>
+                  <label class="block text-sm font-semibold">Price <span class="text-green-700">*</span><input class="field mt-2 w-full px-3 py-3" type="number" name="price" min="0" step="0.01" value="{{formProduct.price}}" placeholder="0.00" required></label>
+                  <label class="block text-sm font-semibold">Product image<input class="field mt-2 w-full px-3 py-2" type="file" name="productImage" accept="image/jpeg,image/png,image/gif,image/webp"></label>
+                </div>
+              </section>
+              <section class="form-card p-5 sm:p-6">
+                <h3 class="font-bold">Availability</h3><p class="mt-1 text-xs text-slate-400">Choose whether this product is visible to members.</p>
+                <label class="mt-5 block text-sm font-semibold">Status<select class="field mt-2 w-full px-3 py-3" name="status"><option value="active" {{#unless formProduct.statusInactive}}selected{{/unless}}>Active</option><option value="inactive" {{#if formProduct.statusInactive}}selected{{/if}}>Inactive</option></select></label>
+              </section>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3 border-t border-[#203452] pt-5"><a href="/products" class="rounded-lg border border-[#c9dbce] px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-green-700">Cancel</a><button class="gold-button rounded-lg px-5 py-2.5 text-sm font-bold" type="submit">{{#if isEdit}}Save changes{{else}}Add product{{/if}}</button></div>
+        </form>
+        {{/if}}
+      </div>
+  </main>
+
+  <div id="addProductModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
+    <div class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-slate-200 bg-white text-slate-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-200 bg-emerald-600 px-6 py-4"><h2 class="text-xl font-bold text-white">Add New Product</h2><button id="closeProductModal" type="button" class="text-2xl leading-none text-white/80 hover:text-white" aria-label="Close">&times;</button></div>
+      <form id="addProductForm" class="flex min-h-0 flex-1 flex-col">
+        <div class="flex-1 overflow-y-auto px-6 py-6">
+          <div class="space-y-5">
+            <label class="block text-sm font-medium text-slate-700">Product Name *<input type="text" name="productName" required class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" placeholder="e.g., Organic Rice, Fresh Eggs, Salabat"></label>
+            <label class="block text-sm font-medium text-slate-700">Quantity *<input type="number" name="quantity" required min="0" step="1" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" placeholder="0"></label>
+            <label class="block text-sm font-medium text-slate-700">Price (₱) *<input type="number" name="price" required min="0" step="0.01" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" placeholder="0.00"></label>
+            <label class="block text-sm font-medium text-slate-700">Unit Type *<select name="unit" required class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"><option>Per Piece</option><option>Per Tray</option><option>Per Kilo</option><option>Per Bundle</option><option>Per Pack</option><option>Per Unit</option><option>Per Sack</option></select></label>
+            <div><label class="mb-2 block text-sm font-medium text-slate-700">Product Image (Picture)</label><input id="productImageInput" type="file" name="productImage" accept="image/*" class="hidden"><label id="uploadLabel" for="productImageInput" class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-emerald-300 bg-emerald-50 px-6 py-8 text-center hover:border-emerald-400 hover:bg-emerald-100"><img id="imagePreview" src="" alt="Preview" class="hidden h-32 w-32 rounded-lg object-cover"><svg id="uploadIcon" class="h-12 w-12 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="mt-2 text-xs text-slate-600"><span class="font-semibold text-emerald-600">Click to upload</span> or drag and drop</p><p class="mt-1 text-xs text-slate-500">PNG, JPG, GIF, WEBP up to 5MB</p><p id="fileName" class="mt-2 hidden text-xs text-emerald-600"></p></label></div>
+            <label class="block text-sm font-medium text-slate-700">Description <span class="text-slate-500">(Optional)</span><textarea name="description" rows="3" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200" placeholder="Brief product details or description..."></textarea></label>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 border-t border-slate-200 bg-white px-6 py-4"><button id="cancelProductBtn" type="button" class="rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700">Cancel</button><button type="submit" class="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-emerald-700">Save Product</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="productDetailsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4"><div class="panel w-full max-w-2xl p-6"><div class="flex items-start justify-between"><div><p id="detailCode" class="text-xs uppercase tracking-wider text-slate-500"></p><h2 id="detailName" class="mt-2 text-2xl font-bold"></h2></div><button type="button" id="closeDetailsModal" class="text-2xl text-slate-400 hover:text-white" aria-label="Close">&times;</button></div><div class="mt-6 grid gap-5 sm:grid-cols-[180px_1fr]"><div id="detailImageWrap" class="hidden"><img id="detailImage" class="h-44 w-full rounded-lg object-cover" alt="Product"></div><div class="space-y-4"><p id="detailCategory" class="text-sm text-slate-400"></p><p><span class="text-xs text-slate-500">Quantity</span><br><strong id="detailQuantity"></strong></p><p><span class="text-xs text-slate-500">Price</span><br><strong id="detailPrice"></strong></p><p><span class="text-xs text-slate-500">Description</span><br><span id="detailDescription" class="text-sm text-slate-300"></span></p></div></div><div class="mt-6 flex justify-between border-t border-[#203452] pt-5"><button type="button" id="archiveProductBtn" class="rounded-lg border border-rose-700 px-4 py-2 text-sm font-semibold text-rose-300">Archive</button><div class="flex gap-3"><button type="button" id="closeDetailsBtn" class="rounded-lg border border-slate-600 px-4 py-2 text-sm">Close</button><button type="button" id="editProductBtn" class="gold-button rounded-lg px-4 py-2 text-sm font-bold">Edit product</button></div></div></div></div>
+
+  <div id="editProductModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4"><div class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-2xl"><div class="flex items-center justify-between border-b border-slate-200 bg-emerald-600 px-6 py-4"><h2 class="text-xl font-bold text-white">Edit Product</h2><button id="closeEditModal" type="button" class="text-2xl leading-none text-white/80 hover:text-white" aria-label="Close">&times;</button></div><form id="editProductForm" class="flex min-h-0 flex-1 flex-col"><input type="hidden" id="editProductId" name="productId"><input type="hidden" id="editProductCode" name="productCode"><input type="hidden" id="editCategory" name="category"><div class="flex-1 overflow-y-auto px-6 py-6"><div class="grid gap-5 sm:grid-cols-2"><label class="block text-sm font-medium text-slate-700">Product Name *<input id="editProductName" type="text" name="productName" required class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900"></label><label class="block text-sm font-medium text-slate-700">Quantity *<input id="editQuantity" type="number" name="quantity" required min="0" step="1" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900"></label><label class="block text-sm font-medium text-slate-700">Price (₱) *<input id="editPrice" type="number" name="price" required min="0" step="0.01" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900"></label><label class="block text-sm font-medium text-slate-700">Unit Type *<select id="editUnit" name="unit" required class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900"><option>Per Piece</option><option>Per Tray</option><option>Per Kilo</option><option>Per Bundle</option><option>Per Pack</option><option>Per Unit</option><option>Per Sack</option></select></label></div><label class="mt-5 block text-sm font-medium text-slate-700">Product Image (Picture)<input id="editProductImageInput" type="file" name="productImage" accept="image/*" class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"></label><label class="mt-5 block text-sm font-medium text-slate-700">Description <span class="text-slate-500">(Optional)</span><textarea id="editDescription" name="description" rows="3" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900"></textarea></label></div><div class="flex justify-end gap-3 border-t border-slate-200 bg-white px-6 py-4"><button id="cancelEditBtn" type="button" class="rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700">Cancel</button><button type="submit" class="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-emerald-700">Save Changes</button></div></form></div></div>
+
+  <script>
+    let currentProductId = null;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function applyTheme(theme) {
+      const dark = theme === 'dark';
+      document.body.classList.toggle('dark-mode', dark);
+      if (themeIcon) themeIcon.textContent = dark ? '☾' : '☀';
+      if (themeToggle) {
+        themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+        themeToggle.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+      }
+    }
+
+    applyTheme(localStorage.getItem('kambac-theme') || 'light');
+    themeToggle?.addEventListener('click', () => {
+      const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('kambac-theme', nextTheme);
+      applyTheme(nextTheme);
+    });
+
+    const profileMenuBtn = document.getElementById('profileMenuBtn');
+    const profileMenu = document.getElementById('profileMenu');
+
+    function closeProfileMenu() {
+      profileMenu?.classList.add('hidden');
+      profileMenuBtn?.setAttribute('aria-expanded', 'false');
+    }
+
+    profileMenuBtn?.addEventListener('click', event => {
+      event.stopPropagation();
+      const isHidden = profileMenu?.classList.toggle('hidden');
+      profileMenuBtn.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+    });
+
+    document.addEventListener('click', event => {
+      if (!event.target.closest('#profileMenu') && !event.target.closest('#profileMenuBtn')) closeProfileMenu();
+    });
+
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+
+    function filterProducts() {
+      const term = (searchInput?.value || '').toLowerCase();
+      const category = categoryFilter?.value || '';
+      document.querySelectorAll('.product-card').forEach(card => {
+        const matchesSearch = `${card.dataset.name} ${card.dataset.code}`.toLowerCase().includes(term);
+        const matchesCategory = !category || card.dataset.category === category;
+        card.classList.toggle('hidden', !(matchesSearch && matchesCategory));
+      });
+    }
+    searchInput?.addEventListener('input', filterProducts);
+    categoryFilter?.addEventListener('change', filterProducts);
+
+    const addProductModal = document.getElementById('addProductModal');
+    const addProductForm = document.getElementById('addProductForm');
+    const productImageInput = document.getElementById('productImageInput');
+
+    function openAddProductModal() {
+      addProductModal.classList.remove('hidden');
+      addProductModal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAddProductModal() {
+      addProductModal.classList.add('hidden');
+      addProductModal.classList.remove('flex');
+      document.body.style.overflow = '';
+      addProductForm.reset();
+      document.getElementById('imagePreview').src = '';
+      document.getElementById('imagePreview').classList.add('hidden');
+      document.getElementById('uploadIcon').classList.remove('hidden');
+      document.getElementById('fileName').classList.add('hidden');
+    }
+
+    document.getElementById('addProductBtn')?.addEventListener('click', openAddProductModal);
+    document.getElementById('closeProductModal')?.addEventListener('click', closeAddProductModal);
+    document.getElementById('cancelProductBtn')?.addEventListener('click', closeAddProductModal);
+    addProductModal?.addEventListener('click', event => { if (event.target === addProductModal) closeAddProductModal(); });
+
+    function previewProductImage(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        document.getElementById('imagePreview').src = reader.result;
+        document.getElementById('imagePreview').classList.remove('hidden');
+        document.getElementById('uploadIcon').classList.add('hidden');
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileName').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    productImageInput?.addEventListener('change', event => previewProductImage(event.target.files?.[0]));
+
+    const uploadLabel = document.getElementById('uploadLabel');
+    uploadLabel?.addEventListener('dragover', event => { event.preventDefault(); });
+    uploadLabel?.addEventListener('drop', event => {
+      event.preventDefault();
+      const file = event.dataTransfer?.files?.[0];
+      if (!file) return;
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      productImageInput.files = transfer.files;
+      previewProductImage(file);
+    });
+
+    addProductForm?.addEventListener('submit', async event => {
+      event.preventDefault();
+      try {
+        const response = await fetch('/products/add', { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(addProductForm) });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || 'Unable to add product');
+        window.location.reload();
+      } catch (error) { alert(error.message); }
+    });
+    document.querySelectorAll('.view-product').forEach(button => {
+      button.addEventListener('click', () => viewProductDetails(button.dataset.productId));
+    });
+
+    async function viewProductDetails(productId) {
+      try {
+        const response = await fetch(`/products/${productId}`, { headers: { Accept: 'application/json' } });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || 'Unable to load product');
+        const product = result.product;
+        currentProductId = product.id;
+        document.getElementById('detailCode').textContent = product.productCode;
+        document.getElementById('detailName').textContent = product.productName;
+        document.getElementById('detailCategory').textContent = product.category;
+        document.getElementById('detailQuantity').textContent = `${product.quantity} ${product.unit}`;
+        document.getElementById('detailPrice').textContent = `₱${Number(product.price).toFixed(2)} / ${product.unit}`;
+        document.getElementById('detailDescription').textContent = product.description || 'No description provided';
+        document.getElementById('editProductBtn').dataset.productId = product.id;
+        const imageWrap = document.getElementById('detailImageWrap');
+        if (product.imagePath) { document.getElementById('detailImage').src = product.imagePath; imageWrap.classList.remove('hidden'); } else { imageWrap.classList.add('hidden'); }
+        const modal = document.getElementById('productDetailsModal');
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      } catch (error) { alert(error.message); }
+    }
+
+    function closeDetailsModal() { const modal = document.getElementById('productDetailsModal'); modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; currentProductId = null; }
+    document.getElementById('closeDetailsModal')?.addEventListener('click', closeDetailsModal);
+    document.getElementById('closeDetailsBtn')?.addEventListener('click', closeDetailsModal);
+
+    function closeEditModal() {
+      const modal = document.getElementById('editProductModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+      document.getElementById('editProductForm').reset();
+    }
+
+    document.getElementById('editProductBtn')?.addEventListener('click', async () => {
+      if (!currentProductId) return;
+      const response = await fetch(`/products/${currentProductId}`, { headers: { Accept: 'application/json' } });
+      const result = await response.json();
+      if (!response.ok || !result.success) return alert(result.message || 'Unable to load product');
+      const product = result.product;
+      document.getElementById('editProductId').value = product.id;
+      document.getElementById('editProductCode').value = product.productCode;
+      document.getElementById('editCategory').value = product.category;
+      document.getElementById('editProductName').value = product.productName;
+      document.getElementById('editQuantity').value = product.quantity;
+      document.getElementById('editPrice').value = Number(product.price).toFixed(2);
+      document.getElementById('editUnit').value = product.unit || 'Per Piece';
+      document.getElementById('editDescription').value = product.description || '';
+      closeDetailsModal();
+      const modal = document.getElementById('editProductModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    });
+
+    document.getElementById('closeEditModal')?.addEventListener('click', closeEditModal);
+    document.getElementById('cancelEditBtn')?.addEventListener('click', closeEditModal);
+    document.getElementById('editProductModal')?.addEventListener('click', event => { if (event.target.id === 'editProductModal') closeEditModal(); });
+
+    document.getElementById('editProductForm')?.addEventListener('submit', async event => {
+      event.preventDefault();
+      const productId = document.getElementById('editProductId').value;
+      try {
+        const response = await fetch(`/products/${productId}/update`, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(event.currentTarget) });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || 'Unable to update product');
+        window.location.reload();
+      } catch (error) { alert(error.message); }
+    });
+    document.getElementById('productDetailsModal')?.addEventListener('click', event => { if (event.target.id === 'productDetailsModal') closeDetailsModal(); });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      closeProfileMenu();
+      closeDetailsModal();
+      const editModal = document.getElementById('editProductModal');
+      if (!editModal.classList.contains('hidden')) closeEditModal();
+      if (!addProductModal.classList.contains('hidden')) closeAddProductModal();
+    });
+
+    document.getElementById('archiveProductBtn')?.addEventListener('click', async () => {
+      if (!currentProductId || !confirm('Archive this product from active inventory?')) return;
+      const response = await fetch(`/products/${currentProductId}/delete`, { method: 'POST', headers: { Accept: 'application/json' } });
+      const result = await response.json();
+      if (response.ok && result.success) window.location.reload(); else alert(result.message || 'Unable to archive product');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+﻿
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      DB_HOST: host.docker.internal
+      DB_PORT: "3306"
+      DB_NAME: kambac-product
+      DB_USER: kambac_app
+      DB_PASSWORD: "KambacApp_Dev2026!x9"
+    restart: unless-stopped
