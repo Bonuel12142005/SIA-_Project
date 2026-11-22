@@ -1,0 +1,44 @@
+{{> head}}
+<body class="app-page equipment-page equipment-detail-page">
+  <div class="app-layout">
+    {{> sidebar}}
+    <main class="app-main">
+      {{#each success_msg}}
+        <p class="notice notice-success" role="status">{{this}}</p>
+      {{/each}}
+      {{#each error_msg}}
+        <p class="notice notice-error" role="alert">{{this}}</p>
+      {{/each}}
+      <header class="page-header detail-header">
+        <div>
+          <h1>{{item.name}}</h1>
+          <p class="muted-text">{{item.category}} · <span class="detail-status">{{item.statusLabel}}</span></p>
+        </div>
+        <a class="secondary-button" href="/equipment/{{item.id}}/edit">Edit item</a>
+      </header>
+
+      <section class="inventory-panel detail-panel" aria-labelledby="item-details-title">
+        <div class="panel-heading"><h2 id="item-details-title">Equipment details</h2></div>
+        <dl class="detail-grid">
+          <div><dt>Category</dt><dd>{{item.category}}</dd></div>
+          <div><dt>Total quantity</dt><dd>{{item.totalQuantity}}</dd></div>
+          <div><dt>Available quantity</dt><dd>{{item.availableQuantity}}</dd></div>
+          <div><dt>Borrowed quantity</dt><dd>{{item.borrowedQuantity}}</dd></div>
+          <div><dt>Condition</dt><dd>{{item.conditionLabel}}</dd></div>
+          <div><dt>Date added</dt><dd>{{item.createdDate}}</dd></div>
+          <div><dt>Last updated</dt><dd>{{item.updatedDate}}</dd></div>
+          <div class="detail-wide"><dt>Description</dt><dd>{{#if item.description}}{{item.description}}{{else}}No description provided.{{/if}}</dd></div>
+        </dl>
+        <form class="status-form" method="POST" action="/equipment/{{item.id}}/status">
+          {{#if item.isActive}}
+            <p class="muted-text">Archiving keeps the item record and its quantity history; it will no longer appear in active inventory.</p>
+            <button class="danger-button" type="submit" name="action" value="archive">Archive item</button>
+          {{else}}
+            <p class="muted-text">This item is archived and excluded from active inventory.</p>
+            <button class="secondary-button" type="submit" name="action" value="activate">Activate item</button>
+          {{/if}}
+        </form>
+      </section>
+    </main>
+  </div>
+{{> footer}}

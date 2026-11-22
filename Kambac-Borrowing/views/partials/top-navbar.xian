@@ -1,0 +1,29 @@
+<header class="top-navbar">
+  <a class="top-navbar-brand" href="/equipment" aria-label="KAMBAC equipment inventory">
+    <span class="top-navbar-mark" aria-hidden="true">K</span>
+    <span class="top-navbar-copy"><strong>KAMBAC</strong></span>
+  </a>
+
+  <nav class="top-navbar-links" aria-label="Main navigation">
+    <a class="top-navbar-active" href="/equipment" aria-current="page">Equipment</a>
+  </nav>
+
+  <div class="top-navbar-tools" aria-label="Theme and notifications">
+    <button class="top-navbar-tool" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+    </button>
+    <button class="top-navbar-tool" type="button" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+    </button>
+  </div>
+
+  <button class="top-navbar-profile" type="button" aria-label="Open admin profile">
+    <span>KA</span>
+    <span class="top-navbar-profile-name">admin</span>
+  </button>
+
+  <a class="top-navbar-logout" href="/logout" aria-label="Logout">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+    <span>Logout</span>
+  </a>
+</header>
